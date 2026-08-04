@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+@theme {
+  /* Palette "espace profond" du thème Star Wars */
+  --color-space-950: #05070d;
+  --color-space-900: #0a0e18;
+  --color-space-800: #121829;
+  --color-space-700: #1c2438;
+  --color-space-600: #2a3450;
+  --color-space-400: #5c6b8f;
+  --color-space-300: #8b98b8;
+  --color-space-200: #c3cbdf;
+  --color-sw-yellow: #ffe81f;
+  --color-sw-blue: #4fc3f7;
+  --color-sw-red: #ef5350;
+  --color-sw-green: #66bb6a;
+
+  /* Couleurs officielles des 7 dés narratifs */
+  --color-de-aptitude: #41ad49;
+  --color-de-maitrise: #fff200;
+  --color-de-fortune: #72cddc;
+  --color-de-difficulte: #52287e;
+  --color-de-defi: #bc1c2e;
+  --color-de-infortune: #1a1a1a;
+  --color-de-force: #f5f5f5;
+}
+
+body {
+  background-color: var(--color-space-950);
+  background-image:
+    radial-gradient(1px 1px at 12% 22%, rgba(255, 255, 255, 0.55) 50%, transparent 51%),
+    radial-gradient(1px 1px at 68% 8%, rgba(255, 255, 255, 0.4) 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 84% 38%, rgba(255, 255, 255, 0.5) 50%, transparent 51%),
+    radial-gradient(1px 1px at 35% 62%, rgba(255, 255, 255, 0.35) 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 52% 86%, rgba(255, 255, 255, 0.45) 50%, transparent 51%),
+    radial-gradient(1px 1px at 92% 72%, rgba(255, 255, 255, 0.4) 50%, transparent 51%),
+    radial-gradient(1px 1px at 8% 88%, rgba(255, 255, 255, 0.35) 50%, transparent 51%),
+    radial-gradient(ellipse at top, #101830 0%, var(--color-space-950) 60%);
+  background-attachment: fixed;
+  color: var(--color-space-200);
+  min-height: 100vh;
+}
+
+.titre-sw {
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}

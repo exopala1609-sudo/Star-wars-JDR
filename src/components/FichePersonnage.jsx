@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { CARACTERISTIQUES, COMPETENCES, reserveDeDes } from '../data/competences.js'
 import Compteur from './Compteur.jsx'
-import ReserveDesApercu from './ReserveDesApercu.jsx'
+import ConstructeurReserve from './ConstructeurReserve.jsx'
 
 // Pastilles de rang (●●○○○) affichées à côté de chaque compétence.
 function Rangs({ rang }) {
@@ -26,7 +26,7 @@ function Section({ titre, children }) {
   )
 }
 
-export default function FichePersonnage({ perso, etat, onEtat, onRetour }) {
+export default function FichePersonnage({ perso, etat, onEtat, onRetour, onLancer }) {
   const [compSelectionnee, setCompSelectionnee] = useState(null)
 
   const majEtat = (champ, valeur) => onEtat({ ...etat, [champ]: valeur })
@@ -122,10 +122,13 @@ export default function FichePersonnage({ perso, etat, onEtat, onRetour }) {
           <Section titre="Compétences — cliquez pour préparer un jet">
             {reserve && (
               <div className="mb-3">
-                <ReserveDesApercu
+                <ConstructeurReserve
                   competence={comp.nom}
                   carac={CARACTERISTIQUES[comp.carac]}
-                  reserve={reserve}
+                  reserveBase={reserve}
+                  onLancer={(reserveLancee, resultat) =>
+                    onLancer({ competence: comp.nom, reserve: reserveLancee, resultat })
+                  }
                 />
               </div>
             )}

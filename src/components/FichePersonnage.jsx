@@ -20,8 +20,11 @@ function Rangs({ rang }) {
 
 function Section({ titre, children }) {
   return (
-    <section className="rounded-2xl border border-space-600 bg-space-800/60 p-4">
-      <h3 className="titre-sw text-sm text-sw-blue mb-3">{titre}</h3>
+    <section className="datapad p-4">
+      <h3 className="titre-sw text-sm text-sw-or mb-3 flex items-center gap-2 border-b border-sw-or/25 pb-2">
+        <span className="inline-block h-3.5 w-1.5 bg-sw-or -skew-x-12 shrink-0" />
+        {titre}
+      </h3>
       {children}
     </section>
   )
@@ -43,27 +46,28 @@ export default function FichePersonnage({ perso, etat, onEtat, onRetour, onLance
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-6 flex flex-col gap-4">
-      {/* ——— En-tête ——— */}
-      <div className="flex items-start gap-4 flex-wrap">
-        <button
-          onClick={onRetour}
-          className="rounded-lg border border-space-600 bg-space-800 px-3 py-2 text-sm hover:border-sw-yellow transition"
-        >
-          ← Personnages
-        </button>
-        <div className="flex items-center gap-4 flex-1 min-w-60">
-          <Avatar perso={perso} tailleClasse="h-16 w-16" tailleEmoji="text-3xl" />
-          <div>
-            <h2 className="titre-sw text-2xl text-sw-yellow">{perso.nom}</h2>
-            <p className="text-sm text-space-300">
-              {perso.espece} · {perso.carriere} ({perso.specialisation})
-            </p>
+      {/* ——— En-tête d'identité : le panneau datapad principal ——— */}
+      <div className="datapad p-4 flex flex-col gap-4">
+        <div className="flex items-start gap-4 flex-wrap">
+          <button
+            onClick={onRetour}
+            className="rounded-lg border border-space-600 bg-space-800 px-3 py-2 text-sm hover:border-sw-yellow transition"
+          >
+            ← Personnages
+          </button>
+          <div className="flex items-center gap-4 flex-1 min-w-60">
+            <Avatar perso={perso} tailleClasse="h-16 w-16" tailleEmoji="text-3xl" />
+            <div>
+              <h2 className="titre-sw text-2xl text-sw-yellow">{perso.nom}</h2>
+              <p className="text-sm text-space-300">
+                {perso.espece} · {perso.carriere} ({perso.specialisation})
+              </p>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* ——— Compteurs d'état ——— */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+        {/* ——— Compteurs d'état ——— */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
         <Compteur
           label="Blessures"
           valeur={etat.blessures}
@@ -90,9 +94,10 @@ export default function FichePersonnage({ perso, etat, onEtat, onRetour, onLance
           couleur="var(--color-sw-green)"
           onChange={(v) => majEtat('defenseDistance', v)}
         />
-        <div className="rounded-xl border border-space-600 bg-space-800/80 p-3 flex flex-col justify-center items-center gap-1">
-          <span className="text-xs uppercase tracking-wider text-space-300">Encaissement</span>
-          <span className="text-2xl font-bold text-space-200">{perso.encaissement}</span>
+          <div className="rounded-xl border border-space-600 bg-space-800/80 p-3 flex flex-col justify-center items-center gap-1">
+            <span className="text-xs uppercase tracking-wider text-space-300">Encaissement</span>
+            <span className="text-2xl font-bold text-space-200">{perso.encaissement}</span>
+          </div>
         </div>
       </div>
 
@@ -102,11 +107,8 @@ export default function FichePersonnage({ perso, etat, onEtat, onRetour, onLance
           <Section titre="Caractéristiques">
             <div className="grid grid-cols-3 gap-2">
               {Object.entries(CARACTERISTIQUES).map(([id, nom]) => (
-                <div
-                  key={id}
-                  className="rounded-xl bg-space-700 p-2 text-center border border-space-600"
-                >
-                  <div className="text-2xl font-bold text-sw-yellow">
+                <div key={id} className="capsule-carac p-2 text-center">
+                  <div className="text-2xl font-bold text-sw-or">
                     {perso.caracteristiques[id]}
                   </div>
                   <div className="text-[11px] uppercase tracking-wide text-space-300">{nom}</div>

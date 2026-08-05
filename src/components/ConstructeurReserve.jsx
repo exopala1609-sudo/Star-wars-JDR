@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { TYPES_DES, ORDRE_DES, RESERVE_VIDE, lancerReserve } from '../logique/des.js'
 import ResultatLancer from './ResultatLancer.jsx'
+import AnimationLancer from './AnimationLancer.jsx'
 
 // Constructeur de réserve de dés : pré-rempli automatiquement
 // depuis la compétence cliquée (dés jaunes/verts), le joueur y
@@ -38,6 +39,7 @@ function LigneDe({ type, nombre, onChange }) {
 export default function ConstructeurReserve({ competence, carac, reserveBase, onLancer }) {
   const [reserve, setReserve] = useState({ ...RESERVE_VIDE, ...reserveBase })
   const [resultat, setResultat] = useState(null)
+  const [animation, setAnimation] = useState(null)
 
   // Quand on change de compétence, la réserve repart de la base
   // calculée (caractéristique + rang) et le résultat s'efface.
@@ -48,10 +50,16 @@ export default function ConstructeurReserve({ competence, carac, reserveBase, on
 
   const totalDes = Object.values(reserve).reduce((somme, n) => somme + n, 0)
 
-  const lancer = () => {
-    const res = lancerReserve(reserve)
-    setResultat(res)
-    onLancer(reserve, res)
+  // Le tirage est calculé immédiatement, puis mis en scène par
+  // l'animation ; le résultat n'est inscrit dans l'historique
+  // qu'une fois la mise en scène terminée.
+  const lancer = () => setAnimation(lancerReserve(reserve))
+
+  const terminerAnimation = () => {
+    if (!animation) return
+    setResultat(animation)
+    onLancer(reserve, animation)
+    setAnimation(null)
   }
 
   return (
@@ -82,6 +90,8 @@ export default function ConstructeurReserve({ competence, carac, reserveBase, on
       </button>
 
       {resultat && <ResultatLancer resultat={resultat} />}
+
+      {animation && <AnimationLancer resultat={animation} onTerminee={terminerAnimation} />}
     </div>
   )
 }

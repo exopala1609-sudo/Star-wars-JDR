@@ -15,6 +15,7 @@
   --color-sw-red: #ef5350;
   --color-sw-green: #66bb6a;
   --color-holo: #6fd6ff;
+  --color-sw-or: #e8a33d;
 
   /* Couleurs officielles des 7 dés narratifs */
   --color-de-aptitude: #41ad49;
@@ -126,4 +127,173 @@ body::after {
   box-shadow:
     0 0 18px rgba(111, 214, 255, 0.7),
     inset 0 0 14px rgba(111, 214, 255, 0.4);
+}
+
+/* ============================================================
+   PANNEAUX "DATAPAD" — coins biseautés et liseré doré
+   Technique : le fond de l'élément EST le liseré ; un
+   pseudo-élément légèrement plus petit, découpé pareil,
+   dessine le fond sombre par-dessus.
+   ============================================================ */
+.datapad {
+  position: relative;
+  background: rgba(232, 163, 61, 0.38);
+  clip-path: polygon(
+    0 0,
+    calc(100% - 14px) 0,
+    100% 14px,
+    100% 100%,
+    14px 100%,
+    0 calc(100% - 14px)
+  );
+  transition: background 0.25s ease, transform 0.25s ease;
+}
+
+.datapad::before {
+  content: '';
+  position: absolute;
+  inset: 1px;
+  background: rgba(13, 18, 32, 0.93);
+  clip-path: polygon(
+    0 0,
+    calc(100% - 13px) 0,
+    100% 13px,
+    100% 100%,
+    13px 100%,
+    0 calc(100% - 13px)
+  );
+}
+
+.datapad > * {
+  position: relative;
+}
+
+.datapad-hover:hover {
+  background: rgba(232, 163, 61, 0.95);
+}
+
+/* Capsule octogonale des caractéristiques */
+.capsule-carac {
+  position: relative;
+  background: rgba(232, 163, 61, 0.55);
+  clip-path: polygon(
+    8px 0,
+    calc(100% - 8px) 0,
+    100% 8px,
+    100% calc(100% - 8px),
+    calc(100% - 8px) 100%,
+    8px 100%,
+    0 calc(100% - 8px),
+    0 8px
+  );
+}
+
+.capsule-carac::before {
+  content: '';
+  position: absolute;
+  inset: 1.5px;
+  background: #141a2d;
+  clip-path: polygon(
+    7px 0,
+    calc(100% - 7px) 0,
+    100% 7px,
+    100% calc(100% - 7px),
+    calc(100% - 7px) 100%,
+    7px 100%,
+    0 calc(100% - 7px),
+    0 7px
+  );
+}
+
+.capsule-carac > * {
+  position: relative;
+}
+
+/* ============================================================
+   ANIMATION DE LANCER DE DÉS
+   Formes géométriques par nombre de faces + trois phases :
+   entrée (chute/rotation), roulement (secousse), impact.
+   Uniquement transform/opacity : accéléré par le GPU.
+   ============================================================ */
+.de-forme-d6 {
+  border-radius: 14%;
+}
+
+.de-forme-d8 {
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+}
+
+.de-forme-d12 {
+  clip-path: polygon(50% 0, 100% 38%, 81% 100%, 19% 100%, 0 38%);
+}
+
+@keyframes de-entree {
+  0% {
+    transform: translateY(-45vh) rotate(-540deg) scale(0.4);
+    opacity: 0;
+  }
+  55% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes de-secousse {
+  0%,
+  100% {
+    transform: rotate(-7deg) translateX(-2px);
+  }
+  50% {
+    transform: rotate(7deg) translateX(2px);
+  }
+}
+
+@keyframes de-impact {
+  0% {
+    transform: scale(1.35);
+    filter: brightness(1.7);
+  }
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+}
+
+@keyframes apparition {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.de-anim-entree {
+  animation: de-entree 0.45s cubic-bezier(0.2, 0.8, 0.3, 1.15) both;
+}
+
+.de-anim-secousse {
+  animation: de-secousse 0.16s ease-in-out infinite;
+}
+
+.de-anim-impact {
+  animation: de-impact 0.32s ease-out both;
+}
+
+.anim-apparition {
+  animation: apparition 0.35s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .de-anim-entree,
+  .de-anim-secousse,
+  .de-anim-impact,
+  .anim-apparition {
+    animation: none;
+  }
 }

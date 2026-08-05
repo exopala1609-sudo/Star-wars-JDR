@@ -16,13 +16,13 @@ import { initializeApp } from 'firebase/app'
 import { getDatabase } from 'firebase/database'
 
 const configFirebase = {
-  apiKey: '',
-  authDomain: '',
-  databaseURL: '',
-  projectId: '',
-  storageBucket: '',
-  messagingSenderId: '',
-  appId: '',
+  apiKey: 'AIzaSyAR8-GkmDHkWDo6o0Yv-rSXuPrutgfXGsE',
+  authDomain: 'star-wars-jdr-bf996.firebaseapp.com',
+  databaseURL: 'https://star-wars-jdr-bf996-default-rtdb.europe-west1.firebasedatabase.app',
+  projectId: 'star-wars-jdr-bf996',
+  storageBucket: 'star-wars-jdr-bf996.firebasestorage.app',
+  messagingSenderId: '284638942611',
+  appId: '1:284638942611:web:8ac2ce97a09ea6a2390466',
 }
 
 // La synchronisation est considérée comme configurée dès que

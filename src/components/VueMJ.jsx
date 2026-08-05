@@ -176,6 +176,7 @@ export default function VueMJ({
   majAdversaire,
   ajouterHistorique,
   onRetour,
+  onVerrouiller,
 }) {
   const utiliser = (depuis, vers) => {
     if (force[depuis] <= 0) return
@@ -197,6 +198,13 @@ export default function VueMJ({
             Mode local — les joueurs ne voient pas encore ces changements
           </span>
         )}
+        <button
+          onClick={onVerrouiller}
+          title="Oublier le code sur cet appareil et revenir à l’accueil"
+          className="rounded-lg border border-space-600 bg-space-800 px-3 py-2 text-sm hover:border-sw-or hover:text-sw-or transition"
+        >
+          🔒 Verrouiller
+        </button>
       </div>
 
       {/* ——— Suivi de combat ——— */}

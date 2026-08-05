@@ -17,6 +17,7 @@ import VueMJ from './components/VueMJ.jsx'
 import LanceurLibre from './components/LanceurLibre.jsx'
 import BandeauCombat from './components/BandeauCombat.jsx'
 import BandeauAdversaires from './components/BandeauAdversaires.jsx'
+import AccesMJ, { accesMemorise, oublierAcces } from './components/AccesMJ.jsx'
 
 export default function App() {
   // vue = 'accueil' | 'mj' | identifiant d'un personnage
@@ -30,6 +31,19 @@ export default function App() {
   const [historiqueOuvert, setHistoriqueOuvert] = useState(false)
   const [aideOuverte, setAideOuverte] = useState(false)
   const [lanceurOuvert, setLanceurOuvert] = useState(false)
+  const [demandeCodeMJ, setDemandeCodeMJ] = useState(false)
+
+  // La Vue MJ n'est accessible qu'après saisie du code ; une fois
+  // validé, il reste mémorisé sur l'appareil du MJ.
+  const ouvrirVueMJ = () => {
+    if (accesMemorise()) setVue('mj')
+    else setDemandeCodeMJ(true)
+  }
+
+  const verrouillerVueMJ = () => {
+    oublierAcces()
+    setVue('accueil')
+  }
 
   const persoActif = vue !== 'accueil' && vue !== 'mj' ? getPersonnage(vue) : null
 
@@ -138,9 +152,10 @@ export default function App() {
             majAdversaire={majAdversaire}
             ajouterHistorique={ajouterEntree}
             onRetour={() => setVue('accueil')}
+            onVerrouiller={verrouillerVueMJ}
           />
         ) : (
-          <SelectionPersonnage onChoisir={setVue} onVueMJ={() => setVue('mj')} />
+          <SelectionPersonnage onChoisir={setVue} onVueMJ={ouvrirVueMJ} />
         )}
       </main>
 
@@ -156,6 +171,15 @@ export default function App() {
         ouvert={lanceurOuvert}
         onFermer={() => setLanceurOuvert(false)}
         onLancer={ajouterLancerLibre}
+      />
+
+      <AccesMJ
+        ouvert={demandeCodeMJ}
+        onReussite={() => {
+          setDemandeCodeMJ(false)
+          setVue('mj')
+        }}
+        onAnnuler={() => setDemandeCodeMJ(false)}
       />
     </div>
   )

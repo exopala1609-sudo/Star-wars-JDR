@@ -9,7 +9,7 @@ import AnimationLancer from './AnimationLancer.jsx'
 // injecter des dés depuis sa vue — chacun voit les changements
 // de l'autre en direct.
 
-function LigneDe({ type, nombre, onChange }) {
+export function LigneDe({ type, nombre, onChange }) {
   const def = TYPES_DES[type]
   return (
     <div className="flex items-center gap-2">

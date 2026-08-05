@@ -6,12 +6,15 @@ import {
   useHistoriquePartage,
   useForcePartagee,
   useReservesPartagees,
+  useCombatPartage,
 } from './hooks/useSynchronisation.js'
 import SelectionPersonnage from './components/SelectionPersonnage.jsx'
 import FichePersonnage from './components/FichePersonnage.jsx'
 import HistoriqueLancers from './components/HistoriqueLancers.jsx'
 import AideDeJeu from './components/AideDeJeu.jsx'
 import VueMJ from './components/VueMJ.jsx'
+import LanceurLibre from './components/LanceurLibre.jsx'
+import BandeauCombat from './components/BandeauCombat.jsx'
 
 export default function App() {
   // vue = 'accueil' | 'mj' | identifiant d'un personnage
@@ -20,24 +23,43 @@ export default function App() {
   const [historique, ajouterEntree] = useHistoriquePartage()
   const [force, majForce] = useForcePartagee()
   const [reserves, majReserve] = useReservesPartagees()
+  const [combat, majCombat] = useCombatPartage()
   const [historiqueOuvert, setHistoriqueOuvert] = useState(false)
   const [aideOuverte, setAideOuverte] = useState(false)
+  const [lanceurOuvert, setLanceurOuvert] = useState(false)
 
   const persoActif = vue !== 'accueil' && vue !== 'mj' ? getPersonnage(vue) : null
 
+  const nouvelleEntree = (identite, competence, reserve, resultat) => ({
+    ts: Date.now(),
+    heure: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
+    perso: identite,
+    competence,
+    reserve,
+    resultat,
+  })
+
   const ajouterLancer = ({ competence, reserve, resultat }) => {
-    ajouterEntree({
-      ts: Date.now(),
-      heure: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
-      perso: {
-        nom: persoActif.nom,
-        emoji: persoActif.emoji,
-        couleur: persoActif.couleur,
-      },
-      competence,
-      reserve,
-      resultat,
-    })
+    ajouterEntree(
+      nouvelleEntree(
+        { nom: persoActif.nom, emoji: persoActif.emoji, couleur: persoActif.couleur },
+        competence,
+        reserve,
+        resultat,
+      ),
+    )
+  }
+
+  // Identité affichée dans l'historique pour un lancer libre :
+  // le personnage ouvert, sinon le MJ, sinon « La table »
+  const identiteLibre = persoActif
+    ? { nom: persoActif.nom, emoji: persoActif.emoji, couleur: persoActif.couleur }
+    : vue === 'mj'
+      ? { nom: 'MJ', emoji: '🎛', couleur: '#e8a33d' }
+      : { nom: 'La table', emoji: '🎲', couleur: '#5c6b8f' }
+
+  const ajouterLancerLibre = (reserve, resultat) => {
+    ajouterEntree(nouvelleEntree(identiteLibre, 'Lancer libre', reserve, resultat))
   }
 
   return (
@@ -64,6 +86,12 @@ export default function App() {
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <button
+              onClick={() => setLanceurOuvert(true)}
+              className="rounded-lg border border-space-600 bg-space-800 px-3 py-1.5 text-sm hover:border-sw-yellow transition"
+            >
+              🎲 Libre
+            </button>
+            <button
               onClick={() => setAideOuverte(true)}
               className="rounded-lg border border-space-600 bg-space-800 px-3 py-1.5 text-sm hover:border-sw-yellow transition"
             >
@@ -73,11 +101,13 @@ export default function App() {
               onClick={() => setHistoriqueOuvert(true)}
               className="rounded-lg border border-space-600 bg-space-800 px-3 py-1.5 text-sm hover:border-sw-yellow transition"
             >
-              🎲 Historique{historique.length > 0 ? ` (${historique.length})` : ''}
+              📜 Historique{historique.length > 0 ? ` (${historique.length})` : ''}
             </button>
           </div>
         </div>
       </header>
+
+      <BandeauCombat combat={combat} />
 
       <main>
         {persoActif ? (
@@ -98,6 +128,9 @@ export default function App() {
             majForce={majForce}
             reserves={reserves}
             majReserve={majReserve}
+            combat={combat}
+            majCombat={majCombat}
+            ajouterHistorique={ajouterEntree}
             onRetour={() => setVue('accueil')}
           />
         ) : (
@@ -112,6 +145,12 @@ export default function App() {
       />
 
       <AideDeJeu ouvert={aideOuverte} onFermer={() => setAideOuverte(false)} />
+
+      <LanceurLibre
+        ouvert={lanceurOuvert}
+        onFermer={() => setLanceurOuvert(false)}
+        onLancer={ajouterLancerLibre}
+      />
     </div>
   )
 }

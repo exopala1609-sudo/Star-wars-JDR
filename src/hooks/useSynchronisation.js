@@ -117,6 +117,27 @@ export function useReservesPartagees() {
   return [reserves, majReserve]
 }
 
+// ——— Suivi de combat : tour, participant actif et ordre
+// d'initiative, partagés avec toute la table. `null` = pas de
+// combat en cours.
+export function useCombatPartage() {
+  const [combat, setCombat] = useState(null)
+
+  useEffect(() => {
+    if (!db) return
+    return onValue(ref(db, 'salle/combat'), (instantane) => {
+      setCombat(instantane.exists() ? instantane.val() : null)
+    })
+  }, [])
+
+  const majCombat = (nouveau) => {
+    setCombat(nouveau)
+    if (db) set(ref(db, 'salle/combat'), nouveau)
+  }
+
+  return [combat, majCombat]
+}
+
 // ——— Réserve de Force du groupe (points lumineux / obscurs)
 export function useForcePartagee() {
   const [force, setForce] = useState({ lumineux: 0, obscurs: 0 })

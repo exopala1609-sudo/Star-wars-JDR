@@ -3,6 +3,7 @@ import { TYPES_DES } from '../logique/des.js'
 import Avatar from './Avatar.jsx'
 import IconeSymbole from './IconeSymbole.jsx'
 import MiniReserve from './MiniReserve.jsx'
+import SuiviCombat from './SuiviCombat.jsx'
 import { estConfigure } from '../firebase.js'
 
 // Vue du Maître de Jeu : tableau de bord des 6 personnages
@@ -161,7 +162,18 @@ function CompteurForce({ symbole, nom, valeur, onChange }) {
   )
 }
 
-export default function VueMJ({ etats, majEtat, force, majForce, reserves, majReserve, onRetour }) {
+export default function VueMJ({
+  etats,
+  majEtat,
+  force,
+  majForce,
+  reserves,
+  majReserve,
+  combat,
+  majCombat,
+  ajouterHistorique,
+  onRetour,
+}) {
   const utiliser = (depuis, vers) => {
     if (force[depuis] <= 0) return
     majForce({ ...force, [depuis]: force[depuis] - 1, [vers]: force[vers] + 1 })
@@ -183,6 +195,9 @@ export default function VueMJ({ etats, majEtat, force, majForce, reserves, majRe
           </span>
         )}
       </div>
+
+      {/* ——— Suivi de combat ——— */}
+      <SuiviCombat combat={combat} majCombat={majCombat} ajouterHistorique={ajouterHistorique} />
 
       {/* ——— Réserve de Force du groupe ——— */}
       <div className="datapad p-4 flex flex-col gap-3">

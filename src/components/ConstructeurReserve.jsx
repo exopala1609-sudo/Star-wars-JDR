@@ -1,12 +1,13 @@
-import { useState, useEffect } from 'react'
-import { TYPES_DES, ORDRE_DES, RESERVE_VIDE, lancerReserve } from '../logique/des.js'
+import { useState } from 'react'
+import { TYPES_DES, ORDRE_DES, lancerReserve } from '../logique/des.js'
 import ResultatLancer from './ResultatLancer.jsx'
 import AnimationLancer from './AnimationLancer.jsx'
 
 // Constructeur de réserve de dés : pré-rempli automatiquement
-// depuis la compétence cliquée (dés jaunes/verts), le joueur y
-// ajoute ensuite les dés de difficulté, fortune, etc. avant de
-// lancer le tout.
+// depuis la compétence cliquée (dés jaunes/verts). La réserve
+// est PARTAGÉE : le joueur l'ajuste ici, et le MJ peut y
+// injecter des dés depuis sa vue — chacun voit les changements
+// de l'autre en direct.
 
 function LigneDe({ type, nombre, onChange }) {
   const def = TYPES_DES[type]
@@ -36,29 +37,21 @@ function LigneDe({ type, nombre, onChange }) {
   )
 }
 
-export default function ConstructeurReserve({ competence, carac, reserveBase, onLancer }) {
-  const [reserve, setReserve] = useState({ ...RESERVE_VIDE, ...reserveBase })
+export default function ConstructeurReserve({ competence, carac, des, onChange, onLancer }) {
   const [resultat, setResultat] = useState(null)
   const [animation, setAnimation] = useState(null)
 
-  // Quand on change de compétence, la réserve repart de la base
-  // calculée (caractéristique + rang) et le résultat s'efface.
-  useEffect(() => {
-    setReserve({ ...RESERVE_VIDE, ...reserveBase })
-    setResultat(null)
-  }, [competence]) // eslint-disable-line react-hooks/exhaustive-deps
-
-  const totalDes = Object.values(reserve).reduce((somme, n) => somme + n, 0)
+  const totalDes = Object.values(des).reduce((somme, n) => somme + n, 0)
 
   // Le tirage est calculé immédiatement, puis mis en scène par
   // l'animation ; le résultat n'est inscrit dans l'historique
   // qu'une fois la mise en scène terminée.
-  const lancer = () => setAnimation(lancerReserve(reserve))
+  const lancer = () => setAnimation(lancerReserve(des))
 
   const terminerAnimation = () => {
     if (!animation) return
     setResultat(animation)
-    onLancer(reserve, animation)
+    onLancer(des, animation)
     setAnimation(null)
   }
 
@@ -69,13 +62,17 @@ export default function ConstructeurReserve({ competence, carac, reserveBase, on
         <span className="text-xs text-space-300">basée sur {carac}</span>
       </div>
 
+      <p className="text-xs text-space-400 -mt-1">
+        Réserve visible par le MJ — il peut y ajouter des dés à distance.
+      </p>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1.5">
         {ORDRE_DES.map((type) => (
           <LigneDe
             key={type}
             type={type}
-            nombre={reserve[type]}
-            onChange={(n) => setReserve({ ...reserve, [type]: n })}
+            nombre={des[type] ?? 0}
+            onChange={(n) => onChange({ ...des, [type]: n })}
           />
         ))}
       </div>

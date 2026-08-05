@@ -91,6 +91,32 @@ export function useHistoriquePartage() {
   return [entrees, ajouter]
 }
 
+// ——— Réserves de dés en préparation, une par personnage.
+// Le joueur la construit depuis sa fiche, le MJ la voit dans sa
+// vue et peut y injecter des dés avant le lancer.
+export function useReservesPartagees() {
+  const [reserves, setReserves] = useState({})
+
+  useEffect(() => {
+    if (!db) return
+    return onValue(ref(db, 'salle/reserves'), (instantane) => {
+      setReserves(instantane.val() ?? {})
+    })
+  }, [])
+
+  const majReserve = (persoId, reserve) => {
+    setReserves((precedent) => {
+      const nouvelles = { ...precedent }
+      if (reserve === null) delete nouvelles[persoId]
+      else nouvelles[persoId] = reserve
+      return nouvelles
+    })
+    if (db) set(ref(db, `salle/reserves/${persoId}`), reserve)
+  }
+
+  return [reserves, majReserve]
+}
+
 // ——— Réserve de Force du groupe (points lumineux / obscurs)
 export function useForcePartagee() {
   const [force, setForce] = useState({ lumineux: 0, obscurs: 0 })

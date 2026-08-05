@@ -5,6 +5,7 @@ import {
   useEtatsPartages,
   useHistoriquePartage,
   useForcePartagee,
+  useReservesPartagees,
 } from './hooks/useSynchronisation.js'
 import SelectionPersonnage from './components/SelectionPersonnage.jsx'
 import FichePersonnage from './components/FichePersonnage.jsx'
@@ -18,6 +19,7 @@ export default function App() {
   const [etats, majEtat] = useEtatsPartages()
   const [historique, ajouterEntree] = useHistoriquePartage()
   const [force, majForce] = useForcePartagee()
+  const [reserves, majReserve] = useReservesPartagees()
   const [historiqueOuvert, setHistoriqueOuvert] = useState(false)
   const [aideOuverte, setAideOuverte] = useState(false)
 
@@ -85,6 +87,8 @@ export default function App() {
             onEtat={(nouvelEtat) => majEtat(persoActif.id, nouvelEtat)}
             onRetour={() => setVue('accueil')}
             onLancer={ajouterLancer}
+            reservePartagee={reserves[persoActif.id]}
+            onReserve={(reserve) => majReserve(persoActif.id, reserve)}
           />
         ) : vue === 'mj' ? (
           <VueMJ
@@ -92,6 +96,8 @@ export default function App() {
             majEtat={majEtat}
             force={force}
             majForce={majForce}
+            reserves={reserves}
+            majReserve={majReserve}
             onRetour={() => setVue('accueil')}
           />
         ) : (

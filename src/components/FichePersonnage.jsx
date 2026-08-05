@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { CARACTERISTIQUES, COMPETENCES, reserveDeDes } from '../data/competences.js'
+import { RESERVE_VIDE } from '../logique/des.js'
 import Compteur from './Compteur.jsx'
 import ConstructeurReserve from './ConstructeurReserve.jsx'
 import Avatar from './Avatar.jsx'
@@ -30,14 +31,55 @@ function Section({ titre, children }) {
   )
 }
 
-export default function FichePersonnage({ perso, etat, onEtat, onRetour, onLancer }) {
+export default function FichePersonnage({
+  perso,
+  etat,
+  onEtat,
+  onRetour,
+  onLancer,
+  reservePartagee,
+  onReserve,
+}) {
   const [compSelectionnee, setCompSelectionnee] = useState(null)
 
   const majEtat = (champ, valeur) => onEtat({ ...etat, [champ]: valeur })
 
   const comp = compSelectionnee && COMPETENCES.find((c) => c.id === compSelectionnee)
-  const reserve =
+
+  // Les dés affichés : la réserve partagée si elle correspond à
+  // la compétence sélectionnée (le MJ a pu la modifier), sinon
+  // la base calculée depuis caractéristique + rang.
+  const base =
     comp && reserveDeDes(perso.caracteristiques[comp.carac], perso.competences[comp.id] ?? 0)
+  const des = comp
+    ? reservePartagee && reservePartagee.competence === comp.nom
+      ? { ...RESERVE_VIDE, ...reservePartagee.des }
+      : { ...RESERVE_VIDE, maitrise: base.maitrise, aptitude: base.aptitude }
+    : null
+
+  const selectionner = (c, dejaActive) => {
+    if (dejaActive) {
+      setCompSelectionnee(null)
+      onReserve(null)
+      return
+    }
+    setCompSelectionnee(c.id)
+    // Une réserve déjà en préparation pour cette compétence est
+    // conservée : elle peut contenir des dés injectés par le MJ.
+    if (reservePartagee && reservePartagee.competence === c.nom) return
+    const nouvelleBase = reserveDeDes(
+      perso.caracteristiques[c.carac],
+      perso.competences[c.id] ?? 0,
+    )
+    onReserve({
+      competence: c.nom,
+      des: {
+        ...RESERVE_VIDE,
+        maitrise: nouvelleBase.maitrise,
+        aptitude: nouvelleBase.aptitude,
+      },
+    })
+  }
 
   const groupes = [
     { titre: 'Compétences générales', liste: COMPETENCES.filter((c) => c.groupe === 'generale') },
@@ -118,12 +160,15 @@ export default function FichePersonnage({ perso, etat, onEtat, onRetour, onLance
           </Section>
 
           <Section titre="Compétences — cliquez pour préparer un jet">
-            {reserve && (
+            {des && (
               <div className="mb-3">
                 <ConstructeurReserve
                   competence={comp.nom}
                   carac={CARACTERISTIQUES[comp.carac]}
-                  reserveBase={reserve}
+                  des={des}
+                  onChange={(nouveauxDes) =>
+                    onReserve({ competence: comp.nom, des: nouveauxDes })
+                  }
                   onLancer={(reserveLancee, resultat) =>
                     onLancer({ competence: comp.nom, reserve: reserveLancee, resultat })
                   }
@@ -140,7 +185,7 @@ export default function FichePersonnage({ perso, etat, onEtat, onRetour, onLance
                     return (
                       <li key={c.id}>
                         <button
-                          onClick={() => setCompSelectionnee(active ? null : c.id)}
+                          onClick={() => selectionner(c, active)}
                           className={`w-full flex items-center justify-between gap-2 px-2 py-1.5 rounded-lg transition text-sm
                             ${active ? 'bg-space-700 ring-1 ring-sw-yellow/60 text-sw-yellow' : 'hover:bg-space-700'}`}
                         >

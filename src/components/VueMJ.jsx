@@ -1,6 +1,8 @@
 import { PERSONNAGES } from '../data/personnages.js'
+import { TYPES_DES } from '../logique/des.js'
 import Avatar from './Avatar.jsx'
 import IconeSymbole from './IconeSymbole.jsx'
+import MiniReserve from './MiniReserve.jsx'
 import { estConfigure } from '../firebase.js'
 
 // Vue du Maître de Jeu : tableau de bord des 6 personnages
@@ -51,7 +53,31 @@ function LigneJauge({ nom, valeur, max, couleur, onChange }) {
   )
 }
 
-function CartePersonnageMJ({ perso, etat, onEtat }) {
+// Dés que le MJ peut injecter dans la réserve d'un joueur
+const DES_INJECTABLES = ['fortune', 'difficulte', 'defi', 'infortune']
+
+function InjectionDe({ type, nombre, onChange }) {
+  const def = TYPES_DES[type]
+  return (
+    <div className="flex items-center gap-1.5">
+      <span
+        className="h-4 w-4 rounded-sm border border-black/30 shrink-0"
+        style={{ backgroundColor: def.couleur }}
+        title={def.nom}
+      />
+      <span className="flex-1 text-xs text-space-300 truncate">{def.nom}</span>
+      <PetitBouton onClick={() => onChange(Math.max(0, nombre - 1))} title={`Retirer ${def.nom}`}>
+        −
+      </PetitBouton>
+      <span className="w-5 text-center text-sm font-bold">{nombre}</span>
+      <PetitBouton onClick={() => onChange(nombre + 1)} title={`Ajouter ${def.nom}`}>
+        +
+      </PetitBouton>
+    </div>
+  )
+}
+
+function CartePersonnageMJ({ perso, etat, onEtat, reserve, onReserve }) {
   const maj = (champ, v) => onEtat({ ...etat, [champ]: v })
   const horsCombat = etat.blessures >= perso.seuilBlessures
   return (
@@ -85,6 +111,34 @@ function CartePersonnageMJ({ perso, etat, onEtat }) {
         couleur="var(--color-sw-blue)"
         onChange={(v) => maj('stress', v)}
       />
+
+      {/* ——— Réserve en préparation : injection de dés ——— */}
+      {reserve ? (
+        <div className="border-t border-space-700 pt-2 flex flex-col gap-2">
+          <div className="text-xs text-space-300">
+            Réserve en préparation :{' '}
+            <span className="text-sw-yellow font-semibold">{reserve.competence}</span>
+          </div>
+          <MiniReserve reserve={reserve.des} />
+          <div className="grid grid-cols-2 gap-x-3 gap-y-1">
+            {DES_INJECTABLES.map((type) => (
+              <InjectionDe
+                key={type}
+                type={type}
+                nombre={reserve.des?.[type] ?? 0}
+                onChange={(n) =>
+                  onReserve({ ...reserve, des: { ...reserve.des, [type]: n } })
+                }
+              />
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div className="border-t border-space-700 pt-2 text-xs text-space-500 italic">
+          Aucune réserve en préparation — elle apparaîtra ici dès que ce joueur
+          cliquera sur une compétence.
+        </div>
+      )}
     </div>
   )
 }
@@ -107,7 +161,7 @@ function CompteurForce({ symbole, nom, valeur, onChange }) {
   )
 }
 
-export default function VueMJ({ etats, majEtat, force, majForce, onRetour }) {
+export default function VueMJ({ etats, majEtat, force, majForce, reserves, majReserve, onRetour }) {
   const utiliser = (depuis, vers) => {
     if (force[depuis] <= 0) return
     majForce({ ...force, [depuis]: force[depuis] - 1, [vers]: force[vers] + 1 })
@@ -176,6 +230,8 @@ export default function VueMJ({ etats, majEtat, force, majForce, onRetour }) {
             perso={p}
             etat={etats[p.id]}
             onEtat={(etat) => majEtat(p.id, etat)}
+            reserve={reserves[p.id]}
+            onReserve={(reserve) => majReserve(p.id, reserve)}
           />
         ))}
       </div>

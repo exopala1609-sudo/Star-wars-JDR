@@ -1,26 +1,9 @@
-import { TYPES_DES, ORDRE_DES } from '../logique/des.js'
 import ResultatLancer from './ResultatLancer.jsx'
+import MiniReserve from './MiniReserve.jsx'
 
 // Historique des lancers : flux antéchronologique des jets de
-// toute la table. Local pour l'instant — il sera partagé en
-// temps réel entre tous les écrans au Jalon 3.
-
-function MiniReserve({ reserve }) {
-  return (
-    <span className="inline-flex gap-1 align-middle">
-      {ORDRE_DES.flatMap((type) =>
-        Array.from({ length: reserve[type] ?? 0 }, (_, i) => (
-          <span
-            key={`${type}${i}`}
-            className="h-3 w-3 rounded-sm border border-black/30 inline-block"
-            style={{ backgroundColor: TYPES_DES[type].couleur }}
-            title={TYPES_DES[type].nom}
-          />
-        )),
-      )}
-    </span>
-  )
-}
+// toute la table, partagé en temps réel quand la table est
+// connectée.
 
 export default function HistoriqueLancers({ entrees, ouvert, onFermer }) {
   if (!ouvert) return null

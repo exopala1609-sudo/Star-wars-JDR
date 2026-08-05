@@ -1,48 +1,31 @@
 import { useState } from 'react'
-import { PERSONNAGES, getPersonnage } from './data/personnages.js'
+import { getPersonnage } from './data/personnages.js'
+import { estConfigure } from './firebase.js'
+import {
+  useEtatsPartages,
+  useHistoriquePartage,
+  useForcePartagee,
+} from './hooks/useSynchronisation.js'
 import SelectionPersonnage from './components/SelectionPersonnage.jsx'
 import FichePersonnage from './components/FichePersonnage.jsx'
 import HistoriqueLancers from './components/HistoriqueLancers.jsx'
 import AideDeJeu from './components/AideDeJeu.jsx'
-
-// État de jeu initial de chaque personnage (compteurs modifiables
-// en séance). Au Jalon 3, cet état sera synchronisé en temps réel
-// entre tous les écrans via la base de données.
-const etatInitial = () =>
-  Object.fromEntries(
-    PERSONNAGES.map((p) => [
-      p.id,
-      {
-        blessures: 0,
-        stress: 0,
-        defenseMelee: p.defense.melee,
-        defenseDistance: p.defense.distance,
-      },
-    ]),
-  )
-
-const CLE_HISTORIQUE = 'swjdr-historique'
-
-const chargerHistorique = () => {
-  try {
-    return JSON.parse(localStorage.getItem(CLE_HISTORIQUE)) ?? []
-  } catch {
-    return []
-  }
-}
+import VueMJ from './components/VueMJ.jsx'
 
 export default function App() {
-  const [persoActifId, setPersoActifId] = useState(null)
-  const [etats, setEtats] = useState(etatInitial)
-  const [historique, setHistorique] = useState(chargerHistorique)
+  // vue = 'accueil' | 'mj' | identifiant d'un personnage
+  const [vue, setVue] = useState('accueil')
+  const [etats, majEtat] = useEtatsPartages()
+  const [historique, ajouterEntree] = useHistoriquePartage()
+  const [force, majForce] = useForcePartagee()
   const [historiqueOuvert, setHistoriqueOuvert] = useState(false)
   const [aideOuverte, setAideOuverte] = useState(false)
 
-  const persoActif = persoActifId && getPersonnage(persoActifId)
+  const persoActif = vue !== 'accueil' && vue !== 'mj' ? getPersonnage(vue) : null
 
   const ajouterLancer = ({ competence, reserve, resultat }) => {
-    const entree = {
-      id: crypto.randomUUID(),
+    ajouterEntree({
+      ts: Date.now(),
       heure: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
       perso: {
         nom: persoActif.nom,
@@ -52,23 +35,32 @@ export default function App() {
       competence,
       reserve,
       resultat,
-    }
-    // Les 50 derniers lancers suffisent pour une séance
-    const nouvelHistorique = [entree, ...historique].slice(0, 50)
-    setHistorique(nouvelHistorique)
-    try {
-      localStorage.setItem(CLE_HISTORIQUE, JSON.stringify(nouvelHistorique))
-    } catch {
-      // stockage local indisponible : l'historique reste en mémoire
-    }
+    })
   }
 
   return (
     <div className="min-h-screen">
       <header className="border-b border-space-700 bg-space-900/80 backdrop-blur sticky top-0 z-10">
-        <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-2">
-          <h1 className="titre-sw text-sw-yellow text-lg">Aux Confins de l’Empire</h1>
-          <div className="flex items-center gap-2">
+        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-3 min-w-0">
+            <h1 className="titre-sw text-sw-yellow text-lg truncate">Aux Confins de l’Empire</h1>
+            <span
+              className={`hidden sm:inline-flex items-center gap-1.5 text-[11px] rounded-full px-2.5 py-0.5 border shrink-0 ${
+                estConfigure
+                  ? 'border-sw-green/50 text-sw-green'
+                  : 'border-space-600 text-space-400'
+              }`}
+              title={
+                estConfigure
+                  ? 'Les écrans de toute la table sont synchronisés'
+                  : 'Synchronisation non configurée : chaque écran est indépendant'
+              }
+            >
+              <span className="h-1.5 w-1.5 rounded-full bg-current" />
+              {estConfigure ? 'Table connectée' : 'Mode local'}
+            </span>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
             <button
               onClick={() => setAideOuverte(true)}
               className="rounded-lg border border-space-600 bg-space-800 px-3 py-1.5 text-sm hover:border-sw-yellow transition"
@@ -90,12 +82,20 @@ export default function App() {
           <FichePersonnage
             perso={persoActif}
             etat={etats[persoActif.id]}
-            onEtat={(nouvelEtat) => setEtats({ ...etats, [persoActif.id]: nouvelEtat })}
-            onRetour={() => setPersoActifId(null)}
+            onEtat={(nouvelEtat) => majEtat(persoActif.id, nouvelEtat)}
+            onRetour={() => setVue('accueil')}
             onLancer={ajouterLancer}
           />
+        ) : vue === 'mj' ? (
+          <VueMJ
+            etats={etats}
+            majEtat={majEtat}
+            force={force}
+            majForce={majForce}
+            onRetour={() => setVue('accueil')}
+          />
         ) : (
-          <SelectionPersonnage onChoisir={setPersoActifId} />
+          <SelectionPersonnage onChoisir={setVue} onVueMJ={() => setVue('mj')} />
         )}
       </main>
 

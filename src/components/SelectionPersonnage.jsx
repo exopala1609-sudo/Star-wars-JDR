@@ -4,13 +4,24 @@ import Avatar from './Avatar.jsx'
 
 // Écran d'accueil : grandes cartes "poster" des 6 personnages,
 // avec leurs statistiques clés visibles d'un coup d'œil.
-export default function SelectionPersonnage({ onChoisir }) {
+export default function SelectionPersonnage({ onChoisir, onVueMJ }) {
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
-      <h2 className="titre-sw text-xl text-sw-yellow mb-1">Choisissez votre personnage</h2>
-      <p className="text-space-300 mb-8 text-sm">
-        Les 6 héros du Kit d’Initiation, prêts à s’évader de Mos Shuuta.
-      </p>
+      <div className="flex items-start justify-between gap-4 flex-wrap mb-8">
+        <div>
+          <h2 className="titre-sw text-xl text-sw-yellow mb-1">Choisissez votre personnage</h2>
+          <p className="text-space-300 text-sm">
+            Les 6 héros du Kit d’Initiation, prêts à s’évader de Mos Shuuta.
+          </p>
+        </div>
+        <button
+          onClick={onVueMJ}
+          className="rounded-lg border border-sw-or/50 bg-space-800 px-4 py-2 text-sm text-sw-or
+                     hover:bg-space-700 hover:border-sw-or transition font-semibold"
+        >
+          🎛 Vue Maître de Jeu
+        </button>
+      </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {PERSONNAGES.map((p) => (

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { CARACTERISTIQUES, COMPETENCES, reserveDeDes } from '../data/competences.js'
 import Compteur from './Compteur.jsx'
 import ConstructeurReserve from './ConstructeurReserve.jsx'
+import Avatar from './Avatar.jsx'
 
 // Pastilles de rang (●●○○○) affichées à côté de chaque compétence.
 function Rangs({ rang }) {
@@ -51,12 +52,7 @@ export default function FichePersonnage({ perso, etat, onEtat, onRetour, onLance
           ← Personnages
         </button>
         <div className="flex items-center gap-4 flex-1 min-w-60">
-          <div
-            className="flex h-16 w-16 items-center justify-center rounded-full text-3xl shadow-inner shrink-0"
-            style={{ backgroundColor: perso.couleur }}
-          >
-            {perso.emoji}
-          </div>
+          <Avatar perso={perso} tailleClasse="h-16 w-16" tailleEmoji="text-3xl" />
           <div>
             <h2 className="titre-sw text-2xl text-sw-yellow">{perso.nom}</h2>
             <p className="text-sm text-space-300">

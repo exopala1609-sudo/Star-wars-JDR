@@ -1,4 +1,5 @@
 import { PERSONNAGES } from '../data/personnages.js'
+import Avatar from './Avatar.jsx'
 
 // Écran d'accueil : la galerie des 6 personnages prêts à jouer.
 export default function SelectionPersonnage({ onChoisir }) {
@@ -18,12 +19,7 @@ export default function SelectionPersonnage({ onChoisir }) {
                        hover:border-sw-yellow hover:bg-space-700 hover:-translate-y-0.5 hover:shadow-lg"
           >
             <div className="flex items-center gap-4 mb-3">
-              <div
-                className="flex h-14 w-14 items-center justify-center rounded-full text-2xl shadow-inner"
-                style={{ backgroundColor: p.couleur }}
-              >
-                {p.emoji}
-              </div>
+              <Avatar perso={p} />
               <div>
                 <div className="text-lg font-bold text-space-200 group-hover:text-sw-yellow transition">
                   {p.nom}

@@ -19,6 +19,7 @@ export const PERSONNAGES = [
     carriere: 'Chasseuse de primes',
     specialisation: 'Assassin',
     emoji: '🎯',
+    avatar: 'avatars/oskara.png',
     couleur: '#2e8b57',
     accroche: 'Tireuse d’élite mortelle et méthodique',
     motivation:
@@ -95,6 +96,7 @@ export const PERSONNAGES = [
     carriere: 'Contrebandier',
     specialisation: 'Pilote',
     emoji: '🚀',
+    avatar: 'avatars/pash.png',
     couleur: '#c0392b',
     accroche: 'Pilote au charme facile et à la gâchette rapide',
     motivation:
@@ -163,6 +165,7 @@ export const PERSONNAGES = [
     carriere: 'Mercenaire',
     specialisation: 'Maraudeur',
     emoji: '🛡️',
+    avatar: 'avatars/lowhhrick.png',
     couleur: '#8b5a2b',
     accroche: 'Colosse au grand cœur, ancien gladiateur d’arène',
     motivation:
@@ -237,6 +240,7 @@ export const PERSONNAGES = [
     carriere: 'Colon',
     specialisation: 'Médecin',
     emoji: '⚕️',
+    avatar: 'avatars/41-vex.png',
     couleur: '#5dade2',
     accroche: 'Droïde médecin en quête de perfectionnement',
     motivation:
@@ -312,6 +316,7 @@ export const PERSONNAGES = [
     carriere: 'Technicien',
     specialisation: 'Mécano',
     emoji: '🔧',
+    avatar: 'avatars/mathus.png',
     couleur: '#e67e22',
     accroche: 'Génie de la mécanique, jamais loin de sa boîte à outils',
     motivation:
@@ -387,6 +392,7 @@ export const PERSONNAGES = [
     carriere: 'Exploratrice',
     specialisation: 'Débrouillarde',
     emoji: '🧭',
+    avatar: 'avatars/sasha.png',
     couleur: '#9b59b6',
     accroche: 'Aventurière curieuse, à l’aise partout dans la galaxie',
     motivation:

@@ -1,4 +1,5 @@
-import { TYPES_DES, SYMBOLES } from '../logique/des.js'
+import { TYPES_DES } from '../logique/des.js'
+import IconeSymbole from './IconeSymbole.jsx'
 
 // Affiche le résultat d'un lancer : les dés obtenus face par
 // face, puis le bilan net calculé automatiquement.
@@ -6,24 +7,25 @@ import { TYPES_DES, SYMBOLES } from '../logique/des.js'
 function FaceDe({ de }) {
   const def = TYPES_DES[de.type]
   const symboles = Object.entries(de.face).flatMap(([sym, n]) =>
-    Array.from({ length: n }, () => SYMBOLES[sym].icone),
+    Array.from({ length: n }, (_, i) => <IconeSymbole key={`${sym}${i}`} symbole={sym} />),
   )
   return (
     <span
-      className="inline-flex h-9 min-w-9 px-1 items-center justify-center rounded-lg text-sm font-bold shadow-md border border-black/30"
+      className="inline-flex h-9 min-w-9 px-1.5 gap-0.5 items-center justify-center rounded-lg shadow-md border border-black/30"
       style={{ backgroundColor: def.couleur, color: def.texte }}
       title={`Dé de ${def.nom}`}
     >
-      {symboles.length > 0 ? symboles.join('') : '·'}
+      {symboles.length > 0 ? symboles : <span className="opacity-50">·</span>}
     </span>
   )
 }
 
-function Badge({ texte, fond, bordure }) {
+function Badge({ symbole, texte, fond, bordure }) {
   return (
     <span
-      className={`rounded-full px-3 py-1 text-sm font-bold ${fond} ${bordure ?? ''}`}
+      className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-bold ${fond} ${bordure ?? ''}`}
     >
+      <IconeSymbole symbole={symbole} />
       {texte}
     </span>
   )
@@ -37,7 +39,8 @@ export default function ResultatLancer({ resultat, compact = false }) {
     badges.push(
       <Badge
         key="s"
-        texte={`✶ ${nets.succes} Succès net${nets.succes > 1 ? 's' : ''} — Réussite !`}
+        symbole="s"
+        texte={`${nets.succes} Succès net${nets.succes > 1 ? 's' : ''} — Réussite !`}
         fond="bg-green-600/90 text-white"
       />,
     )
@@ -45,7 +48,8 @@ export default function ResultatLancer({ resultat, compact = false }) {
     badges.push(
       <Badge
         key="s"
-        texte={`✕ ${Math.abs(nets.succes)} Échec${Math.abs(nets.succes) > 1 ? 's' : ''} net${Math.abs(nets.succes) > 1 ? 's' : ''} — Échec`}
+        symbole="e"
+        texte={`${Math.abs(nets.succes)} Échec${Math.abs(nets.succes) > 1 ? 's' : ''} net${Math.abs(nets.succes) > 1 ? 's' : ''} — Échec`}
         fond="bg-red-700/90 text-white"
       />,
     )
@@ -54,7 +58,8 @@ export default function ResultatLancer({ resultat, compact = false }) {
     badges.push(
       <Badge
         key="a"
-        texte={`▲ ${nets.avantages} Avantage${nets.avantages > 1 ? 's' : ''}`}
+        symbole="a"
+        texte={`${nets.avantages} Avantage${nets.avantages > 1 ? 's' : ''}`}
         fond="bg-sky-600/90 text-white"
       />,
     )
@@ -62,7 +67,8 @@ export default function ResultatLancer({ resultat, compact = false }) {
     badges.push(
       <Badge
         key="m"
-        texte={`▼ ${-nets.avantages} Menace${-nets.avantages > 1 ? 's' : ''}`}
+        symbole="m"
+        texte={`${-nets.avantages} Menace${-nets.avantages > 1 ? 's' : ''}`}
         fond="bg-orange-700/90 text-white"
       />,
     )
@@ -71,7 +77,8 @@ export default function ResultatLancer({ resultat, compact = false }) {
     badges.push(
       <Badge
         key="t"
-        texte={`✪ ${nets.triomphes} Triomphe${nets.triomphes > 1 ? 's' : ''} !`}
+        symbole="t"
+        texte={`${nets.triomphes} Triomphe${nets.triomphes > 1 ? 's' : ''} !`}
         fond="bg-yellow-400 text-black"
       />,
     )
@@ -80,21 +87,23 @@ export default function ResultatLancer({ resultat, compact = false }) {
     badges.push(
       <Badge
         key="d"
-        texte={`⊗ ${nets.desastres} Désastre${nets.desastres > 1 ? 's' : ''} !`}
+        symbole="d"
+        texte={`${nets.desastres} Désastre${nets.desastres > 1 ? 's' : ''} !`}
         fond="bg-purple-800 text-white"
       />,
     )
   }
   if (nets.lumineux > 0) {
     badges.push(
-      <Badge key="l" texte={`○ ${nets.lumineux} Force lumineuse`} fond="bg-white text-black" />,
+      <Badge key="l" symbole="l" texte={`${nets.lumineux} Force lumineuse`} fond="bg-white text-black" />,
     )
   }
   if (nets.obscurs > 0) {
     badges.push(
       <Badge
         key="o"
-        texte={`● ${nets.obscurs} Force obscure`}
+        symbole="o"
+        texte={`${nets.obscurs} Force obscure`}
         fond="bg-black text-white"
         bordure="border border-space-400"
       />,

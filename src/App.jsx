@@ -3,6 +3,7 @@ import { PERSONNAGES, getPersonnage } from './data/personnages.js'
 import SelectionPersonnage from './components/SelectionPersonnage.jsx'
 import FichePersonnage from './components/FichePersonnage.jsx'
 import HistoriqueLancers from './components/HistoriqueLancers.jsx'
+import AideDeJeu from './components/AideDeJeu.jsx'
 
 // État de jeu initial de chaque personnage (compteurs modifiables
 // en séance). Au Jalon 3, cet état sera synchronisé en temps réel
@@ -35,6 +36,7 @@ export default function App() {
   const [etats, setEtats] = useState(etatInitial)
   const [historique, setHistorique] = useState(chargerHistorique)
   const [historiqueOuvert, setHistoriqueOuvert] = useState(false)
+  const [aideOuverte, setAideOuverte] = useState(false)
 
   const persoActif = persoActifId && getPersonnage(persoActifId)
 
@@ -66,12 +68,20 @@ export default function App() {
       <header className="border-b border-space-700 bg-space-900/80 backdrop-blur sticky top-0 z-10">
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-2">
           <h1 className="titre-sw text-sw-yellow text-lg">Aux Confins de l’Empire</h1>
-          <button
-            onClick={() => setHistoriqueOuvert(true)}
-            className="rounded-lg border border-space-600 bg-space-800 px-3 py-1.5 text-sm hover:border-sw-yellow transition"
-          >
-            🎲 Historique{historique.length > 0 ? ` (${historique.length})` : ''}
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setAideOuverte(true)}
+              className="rounded-lg border border-space-600 bg-space-800 px-3 py-1.5 text-sm hover:border-sw-yellow transition"
+            >
+              ? Aide
+            </button>
+            <button
+              onClick={() => setHistoriqueOuvert(true)}
+              className="rounded-lg border border-space-600 bg-space-800 px-3 py-1.5 text-sm hover:border-sw-yellow transition"
+            >
+              🎲 Historique{historique.length > 0 ? ` (${historique.length})` : ''}
+            </button>
+          </div>
         </div>
       </header>
 
@@ -94,6 +104,8 @@ export default function App() {
         ouvert={historiqueOuvert}
         onFermer={() => setHistoriqueOuvert(false)}
       />
+
+      <AideDeJeu ouvert={aideOuverte} onFermer={() => setAideOuverte(false)} />
     </div>
   )
 }

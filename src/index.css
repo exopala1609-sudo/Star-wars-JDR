@@ -14,6 +14,7 @@
   --color-sw-blue: #4fc3f7;
   --color-sw-red: #ef5350;
   --color-sw-green: #66bb6a;
+  --color-holo: #6fd6ff;
 
   /* Couleurs officielles des 7 dés narratifs */
   --color-de-aptitude: #41ad49;
@@ -25,24 +26,104 @@
   --color-de-force: #f5f5f5;
 }
 
+/* ============================================================
+   FOND SPATIAL — Bordure Extérieure
+   Dégradé profond + nébuleuses + trois couches d'étoiles,
+   le tout généré en CSS pur (aucune image à télécharger).
+   ============================================================ */
+
 body {
   background-color: var(--color-space-950);
   background-image:
-    radial-gradient(1px 1px at 12% 22%, rgba(255, 255, 255, 0.55) 50%, transparent 51%),
-    radial-gradient(1px 1px at 68% 8%, rgba(255, 255, 255, 0.4) 50%, transparent 51%),
-    radial-gradient(1.5px 1.5px at 84% 38%, rgba(255, 255, 255, 0.5) 50%, transparent 51%),
-    radial-gradient(1px 1px at 35% 62%, rgba(255, 255, 255, 0.35) 50%, transparent 51%),
-    radial-gradient(1.5px 1.5px at 52% 86%, rgba(255, 255, 255, 0.45) 50%, transparent 51%),
-    radial-gradient(1px 1px at 92% 72%, rgba(255, 255, 255, 0.4) 50%, transparent 51%),
-    radial-gradient(1px 1px at 8% 88%, rgba(255, 255, 255, 0.35) 50%, transparent 51%),
-    radial-gradient(ellipse at top, #101830 0%, var(--color-space-950) 60%);
+    /* Nébuleuse violette au nord-est */
+    radial-gradient(ellipse 60% 40% at 85% 5%, rgba(109, 40, 217, 0.16), transparent 65%),
+    /* Voile bleuté au sud-ouest */
+    radial-gradient(ellipse 50% 35% at 10% 95%, rgba(14, 116, 200, 0.10), transparent 60%),
+    /* Profondeur générale */
+    radial-gradient(ellipse at 50% -10%, #101830 0%, var(--color-space-950) 65%);
   background-attachment: fixed;
   color: var(--color-space-200);
   min-height: 100vh;
+  position: relative;
+}
+
+/* Couche 1 : poussière d'étoiles fines, scintillement très lent */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    radial-gradient(1px 1px at 13px 34px, rgba(255, 255, 255, 0.7) 50%, transparent 51%),
+    radial-gradient(1px 1px at 61px 132px, rgba(255, 255, 255, 0.5) 50%, transparent 51%),
+    radial-gradient(1px 1px at 112px 78px, rgba(255, 255, 255, 0.6) 50%, transparent 51%),
+    radial-gradient(1px 1px at 154px 191px, rgba(255, 255, 255, 0.45) 50%, transparent 51%),
+    radial-gradient(1px 1px at 193px 43px, rgba(255, 255, 255, 0.6) 50%, transparent 51%),
+    radial-gradient(1px 1px at 32px 172px, rgba(255, 255, 255, 0.5) 50%, transparent 51%),
+    radial-gradient(1px 1px at 88px 12px, rgba(255, 255, 255, 0.45) 50%, transparent 51%),
+    radial-gradient(1px 1px at 203px 118px, rgba(255, 255, 255, 0.55) 50%, transparent 51%);
+  background-size: 220px 220px;
+  animation: scintillement 9s ease-in-out infinite;
+}
+
+/* Couche 2 : étoiles plus grosses et plus rares, dont quelques
+   étoiles teintées (bleu glacé, jaune pâle) — fixes */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    radial-gradient(1.6px 1.6px at 47px 91px, rgba(255, 255, 255, 0.85) 50%, transparent 51%),
+    radial-gradient(2px 2px at 231px 313px, rgba(180, 215, 255, 0.8) 50%, transparent 51%),
+    radial-gradient(1.4px 1.4px at 355px 74px, rgba(255, 255, 255, 0.7) 50%, transparent 51%),
+    radial-gradient(2.2px 2.2px at 133px 245px, rgba(255, 240, 190, 0.75) 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 302px 187px, rgba(255, 255, 255, 0.65) 50%, transparent 51%),
+    radial-gradient(1.8px 1.8px at 397px 356px, rgba(190, 225, 255, 0.7) 50%, transparent 51%);
+  background-size: 420px 420px;
+}
+
+@keyframes scintillement {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+
+/* Accessibilité : pas d'animation si l'utilisateur la refuse */
+@media (prefers-reduced-motion: reduce) {
+  body::before {
+    animation: none;
+  }
 }
 
 .titre-sw {
   font-weight: 800;
   letter-spacing: 0.12em;
   text-transform: uppercase;
+}
+
+/* ============================================================
+   CADRE HOLOGRAPHIQUE des portraits de personnages
+   ============================================================ */
+.holo-cadre {
+  border: 2px solid rgba(111, 214, 255, 0.75);
+  outline: 1px solid rgba(111, 214, 255, 0.25);
+  outline-offset: 3px;
+  box-shadow:
+    0 0 10px rgba(111, 214, 255, 0.45),
+    inset 0 0 12px rgba(111, 214, 255, 0.3);
+  transition: box-shadow 0.25s ease, outline-color 0.25s ease;
+}
+
+.holo-cadre img {
+  filter: saturate(0.9) hue-rotate(-6deg) brightness(1.02);
+}
+
+.group:hover .holo-cadre,
+.holo-cadre:hover {
+  outline-color: rgba(111, 214, 255, 0.6);
+  box-shadow:
+    0 0 18px rgba(111, 214, 255, 0.7),
+    inset 0 0 14px rgba(111, 214, 255, 0.4);
 }

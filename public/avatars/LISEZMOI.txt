@@ -1,0 +1,20 @@
+DÉPOSEZ ICI LES PORTRAITS DES PERSONNAGES
+=========================================
+
+Nommez les fichiers exactement ainsi (en minuscules) :
+
+  oskara.png
+  pash.png
+  lowhhrick.png
+  41-vex.png
+  mathus.png
+  sasha.png
+
+Conseils :
+- Format carré recommandé (ex. 512 x 512 pixels) : l'application
+  recadre automatiquement en cercle.
+- Le format .png est attendu ; si vous préférez .jpg, demandez
+  d'abord la modification du champ "avatar" dans
+  src/data/personnages.js.
+- Tant qu'une image manque, l'application affiche l'emoji du
+  personnage à la place — rien ne casse.

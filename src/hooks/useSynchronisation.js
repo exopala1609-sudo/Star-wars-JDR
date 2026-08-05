@@ -117,6 +117,32 @@ export function useReservesPartagees() {
   return [reserves, majReserve]
 }
 
+// ——— Adversaires du MJ. Chaque adversaire porte un drapeau
+// `visible` : s'il est faux, les joueurs ne le voient pas du
+// tout (le MJ garde ses jauges secrètes).
+export function useAdversairesPartages() {
+  const [adversaires, setAdversaires] = useState({})
+
+  useEffect(() => {
+    if (!db) return
+    return onValue(ref(db, 'salle/adversaires'), (instantane) => {
+      setAdversaires(instantane.val() ?? {})
+    })
+  }, [])
+
+  const majAdversaire = (cle, adversaire) => {
+    setAdversaires((precedent) => {
+      const nouveaux = { ...precedent }
+      if (adversaire === null) delete nouveaux[cle]
+      else nouveaux[cle] = adversaire
+      return nouveaux
+    })
+    if (db) set(ref(db, `salle/adversaires/${cle}`), adversaire)
+  }
+
+  return [adversaires, majAdversaire]
+}
+
 // ——— Suivi de combat : tour, participant actif et ordre
 // d'initiative, partagés avec toute la table. `null` = pas de
 // combat en cours.

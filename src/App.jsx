@@ -7,6 +7,7 @@ import {
   useForcePartagee,
   useReservesPartagees,
   useCombatPartage,
+  useAdversairesPartages,
 } from './hooks/useSynchronisation.js'
 import SelectionPersonnage from './components/SelectionPersonnage.jsx'
 import FichePersonnage from './components/FichePersonnage.jsx'
@@ -15,6 +16,7 @@ import AideDeJeu from './components/AideDeJeu.jsx'
 import VueMJ from './components/VueMJ.jsx'
 import LanceurLibre from './components/LanceurLibre.jsx'
 import BandeauCombat from './components/BandeauCombat.jsx'
+import BandeauAdversaires from './components/BandeauAdversaires.jsx'
 
 export default function App() {
   // vue = 'accueil' | 'mj' | identifiant d'un personnage
@@ -24,6 +26,7 @@ export default function App() {
   const [force, majForce] = useForcePartagee()
   const [reserves, majReserve] = useReservesPartagees()
   const [combat, majCombat] = useCombatPartage()
+  const [adversaires, majAdversaire] = useAdversairesPartages()
   const [historiqueOuvert, setHistoriqueOuvert] = useState(false)
   const [aideOuverte, setAideOuverte] = useState(false)
   const [lanceurOuvert, setLanceurOuvert] = useState(false)
@@ -108,6 +111,7 @@ export default function App() {
       </header>
 
       <BandeauCombat combat={combat} />
+      {vue !== 'mj' && <BandeauAdversaires adversaires={adversaires} />}
 
       <main>
         {persoActif ? (
@@ -130,6 +134,8 @@ export default function App() {
             majReserve={majReserve}
             combat={combat}
             majCombat={majCombat}
+            adversaires={adversaires}
+            majAdversaire={majAdversaire}
             ajouterHistorique={ajouterEntree}
             onRetour={() => setVue('accueil')}
           />

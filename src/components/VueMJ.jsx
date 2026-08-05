@@ -4,6 +4,7 @@ import Avatar from './Avatar.jsx'
 import IconeSymbole from './IconeSymbole.jsx'
 import MiniReserve from './MiniReserve.jsx'
 import SuiviCombat from './SuiviCombat.jsx'
+import SectionAdversaires from './SectionAdversaires.jsx'
 import { estConfigure } from '../firebase.js'
 
 // Vue du Maître de Jeu : tableau de bord des 6 personnages
@@ -171,6 +172,8 @@ export default function VueMJ({
   majReserve,
   combat,
   majCombat,
+  adversaires,
+  majAdversaire,
   ajouterHistorique,
   onRetour,
 }) {
@@ -198,6 +201,15 @@ export default function VueMJ({
 
       {/* ——— Suivi de combat ——— */}
       <SuiviCombat combat={combat} majCombat={majCombat} ajouterHistorique={ajouterHistorique} />
+
+      {/* ——— Adversaires ——— */}
+      <SectionAdversaires
+        adversaires={adversaires}
+        majAdversaire={majAdversaire}
+        combat={combat}
+        majCombat={majCombat}
+        ajouterHistorique={ajouterHistorique}
+      />
 
       {/* ——— Réserve de Force du groupe ——— */}
       <div className="datapad p-4 flex flex-col gap-3">

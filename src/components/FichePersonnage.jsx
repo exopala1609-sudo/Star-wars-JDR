@@ -279,6 +279,12 @@ export default function FichePersonnage({
           </Section>
 
           <Section titre="Talents">
+            {perso.talents.length === 0 && (
+              <p className="text-sm text-space-400 italic">
+                Aucun talent de départ — les premiers s’achètent avec l’expérience, dans la
+                section Progression.
+              </p>
+            )}
             <ul className="flex flex-col gap-2">
               {perso.talents.map((t) => (
                 <li key={t.nom} className="text-sm">

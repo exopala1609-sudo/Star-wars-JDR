@@ -484,74 +484,115 @@ export const PERSONNAGES = [
     emoji: '🔧',
     avatar: 'avatars/mathus.png',
     couleur: '#e67e22',
-    verifie: false,
+    verifie: true,
     accroche: 'Génie de la mécanique, jamais loin de sa boîte à outils',
     motivation:
       'Créateur : rien ne le rend plus heureux que réparer, bricoler et améliorer des machines.',
     obligation: 'Contrat de travail racheté par Teemo le Hutt — il lui « appartient » légalement.',
     caracteristiques: {
-      vigueur: 2,
+      vigueur: 3,
       agilite: 2,
       intelligence: 4,
       ruse: 2,
       volonte: 2,
       presence: 2,
     },
-    seuilBlessures: 12,
+    seuilBlessures: 13,
     seuilStress: 12,
-    encaissement: 3,
-    credits: 500,
+    encaissement: 4,
+    credits: 400,
     defense: { melee: 0, distance: 0 },
     competences: {
-      informatique: 2,
-      mecanique: 2,
       astrogation: 1,
-      coordination: 1,
+      athletisme: 1,
+      connaissance: 1,
+      informatique: 1,
       magouilles: 1,
-      perception: 1,
-      'distance-legeres': 1,
+      mecanique: 2,
+      pilotage: 1,
       vigilance: 1,
+      pugilat: 1,
     },
-    talents: [
-      {
-        nom: 'Fondu de mécanique',
-        description: 'Retire un dé d’Infortune (noir) des tests de Mécanique.',
-      },
-      {
-        nom: 'Réparations solides',
-        description: 'Répare 1 point de coque supplémentaire sur un véhicule ou vaisseau.',
-      },
-      {
-        nom: 'Bricoleur',
-        description: 'Peut ajouter 1 point de personnalisation supplémentaire à un équipement.',
-      },
-    ],
+    talents: [],
     armes: [
       {
-        nom: 'Pistolet blaster léger',
+        nom: 'Gants à décharge',
+        competence: 'pugilat',
+        degats: 3,
+        critique: 5,
+        portee: 'Contact',
+        special:
+          '2 Avantages : inflige 3 points de stress en ignorant l’encaissement de la cible.',
+      },
+      {
+        nom: 'Blaster de poche',
         competence: 'distance-legeres',
         degats: 5,
         critique: 4,
-        portee: 'Moyenne',
-        special: 'Paralysante (réglage étourdissant)',
-      },
-      {
-        nom: 'Clé hydraulique',
-        competence: 'corps-a-corps',
-        degats: 4,
-        critique: 5,
-        portee: 'Contact',
-        special: 'Déséquilibrante',
+        portee: 'Courte',
       },
     ],
     equipement: [
-      { nom: 'Boîte à outils' },
-      { nom: 'Datapad' },
-      { nom: 'Pièces détachées' },
-      { nom: 'Lunettes de soudure' },
-      { nom: '1 stimpack', detail: 'Manœuvre : soigne des blessures. Usage unique.' },
+      {
+        nom: '2 stimpacks',
+        detail: 'Manœuvre : soigne un être vivant de 4 blessures. Usage unique.',
+      },
+      { nom: 'Comlink', detail: 'Permet de communiquer à distance.' },
+      { nom: 'Vêtements épais', detail: 'Encaissement 1 (déjà inclus)' },
+      {
+        nom: 'Datapad',
+        detail: 'Ordinateur de poche, permet d’accéder aux systèmes informatiques.',
+      },
+      {
+        nom: 'Trousse de réparation d’urgence',
+        detail: 'Manœuvre : soigne un droïde de 4 blessures. Usage unique.',
+      },
+      {
+        nom: 'Trousse à outils',
+        detail:
+          'Permet de réparer les appareils mécaniques et de « soigner » les droïdes avec la compétence Mécanique.',
+      },
     ],
-    ameliorations: [],
+    ameliorations: [
+      {
+        id: 'perception',
+        type: 'competence',
+        cible: 'perception',
+        nom: 'Compétence Perception',
+        cout: 5,
+        description:
+          'Vous améliorez votre compétence Perception et gagnez 1 rang. Votre réserve de dés passe de 2 Aptitudes à 1 Maîtrise et 1 Aptitude.',
+      },
+      {
+        id: 'pugilat',
+        type: 'competence',
+        cible: 'pugilat',
+        nom: 'Compétence Pugilat',
+        cout: 10,
+        description:
+          'Vous améliorez votre compétence Pugilat et gagnez 1 rang. Votre réserve de dés passe de 1 Maîtrise et 2 Aptitudes à 2 Maîtrises et 1 Aptitude.',
+      },
+      {
+        id: 'endurci',
+        type: 'talent',
+        nom: 'Endurci',
+        cout: 5,
+        seuilBlessures: 1,
+        description:
+          'Vous gagnez le talent Endurci. Votre seuil de blessures augmente de 1 point, passant de 13 à 14.',
+        effetTexte: 'Augmente le seuil de blessures de 1 (déjà compté).',
+      },
+      {
+        id: 'mecanicien-precision',
+        type: 'talent',
+        nom: 'Mécanicien de précision',
+        cout: 5,
+        description:
+          'Vous gagnez le talent Mécanicien de précision. Quand vous effectuez une action réparant le stress mécanique d’un vaisseau ou d’un véhicule, celui-ci élimine 1 point de stress mécanique en plus.',
+        effetTexte:
+          'Une action réparant le stress mécanique d’un vaisseau ou véhicule en élimine 1 point de plus.',
+      },
+    ],
   },
 
   {

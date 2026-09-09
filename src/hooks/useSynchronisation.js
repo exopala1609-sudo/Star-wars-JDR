@@ -117,6 +117,26 @@ export function useReservesPartagees() {
   return [reserves, majReserve]
 }
 
+// ——— Progression : expérience accordée par le MJ et
+// améliorations achetées par chaque joueur.
+export function useProgressionPartagee() {
+  const [progressions, setProgressions] = useState({})
+
+  useEffect(() => {
+    if (!db) return
+    return onValue(ref(db, 'salle/progression'), (instantane) => {
+      setProgressions(instantane.val() ?? {})
+    })
+  }, [])
+
+  const majProgression = (persoId, progression) => {
+    setProgressions((precedent) => ({ ...precedent, [persoId]: progression }))
+    if (db) set(ref(db, `salle/progression/${persoId}`), progression)
+  }
+
+  return [progressions, majProgression]
+}
+
 // ——— Adversaires du MJ. Chaque adversaire porte un drapeau
 // `visible` : s'il est faux, les joueurs ne le voient pas du
 // tout (le MJ garde ses jauges secrètes).

@@ -1,5 +1,5 @@
-import { PERSONNAGES } from '../data/personnages.js'
 import { TYPES_DES } from '../logique/des.js'
+import { xpDisponibles, progressionDe } from '../logique/progression.js'
 import Avatar from './Avatar.jsx'
 import IconeSymbole from './IconeSymbole.jsx'
 import MiniReserve from './MiniReserve.jsx'
@@ -79,9 +79,20 @@ function InjectionDe({ type, nombre, onChange }) {
   )
 }
 
-function CartePersonnageMJ({ perso, etat, onEtat, reserve, onReserve }) {
+function CartePersonnageMJ({
+  perso,
+  etat,
+  onEtat,
+  reserve,
+  onReserve,
+  progression,
+  onDonnerXp,
+  onReinitialiserAchats,
+}) {
   const maj = (champ, v) => onEtat({ ...etat, [champ]: v })
   const horsCombat = etat.blessures >= perso.seuilBlessures
+  const disponibles = xpDisponibles(perso, progression)
+  const nbAchats = progression?.ameliorations?.length ?? 0
   return (
     <div className="datapad p-4 flex flex-col gap-3">
       <div className="flex items-center gap-3">
@@ -113,6 +124,35 @@ function CartePersonnageMJ({ perso, etat, onEtat, reserve, onReserve }) {
         couleur="var(--color-sw-blue)"
         onChange={(v) => maj('stress', v)}
       />
+
+      {/* ——— Expérience accordée ——— */}
+      <div className="border-t border-space-700 pt-2 flex items-center gap-2 flex-wrap">
+        <span className="text-xs uppercase tracking-wide text-space-400">XP</span>
+        <PetitBouton onClick={() => onDonnerXp(-5)} title="Retirer 5 XP">
+          −5
+        </PetitBouton>
+        <PetitBouton onClick={() => onDonnerXp(5)} title="Accorder 5 XP">
+          +5
+        </PetitBouton>
+        <PetitBouton onClick={() => onDonnerXp(10)} title="Accorder 10 XP">
+          +10
+        </PetitBouton>
+        <span className="text-xs text-space-300 ml-auto">
+          <span className={disponibles > 0 ? 'text-sw-yellow font-bold' : ''}>
+            {disponibles} dispo.
+          </span>{' '}
+          · {progression?.xpTotal ?? 0} reçus
+        </span>
+        {nbAchats > 0 && (
+          <button
+            onClick={onReinitialiserAchats}
+            title="Annuler toutes les améliorations achetées par ce joueur"
+            className="h-6 w-6 rounded-md bg-space-700 hover:bg-sw-red/40 text-xs shrink-0"
+          >
+            ↺
+          </button>
+        )}
+      </div>
 
       {/* ——— Réserve en préparation : injection de dés ——— */}
       {reserve ? (
@@ -175,6 +215,10 @@ export default function VueMJ({
   adversaires,
   majAdversaire,
   ajouterHistorique,
+  personnages,
+  progressions,
+  onDonnerXp,
+  onReinitialiserAchats,
   onRetour,
   onVerrouiller,
 }) {
@@ -208,7 +252,12 @@ export default function VueMJ({
       </div>
 
       {/* ——— Suivi de combat ——— */}
-      <SuiviCombat combat={combat} majCombat={majCombat} ajouterHistorique={ajouterHistorique} />
+      <SuiviCombat
+        combat={combat}
+        majCombat={majCombat}
+        ajouterHistorique={ajouterHistorique}
+        personnages={personnages}
+      />
 
       {/* ——— Adversaires ——— */}
       <SectionAdversaires
@@ -259,7 +308,7 @@ export default function VueMJ({
 
       {/* ——— Tableau de bord des personnages ——— */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {PERSONNAGES.map((p) => (
+        {personnages.map((p) => (
           <CartePersonnageMJ
             key={p.id}
             perso={p}
@@ -267,6 +316,9 @@ export default function VueMJ({
             onEtat={(etat) => majEtat(p.id, etat)}
             reserve={reserves[p.id]}
             onReserve={(reserve) => majReserve(p.id, reserve)}
+            progression={progressionDe(progressions, p.id)}
+            onDonnerXp={(delta) => onDonnerXp(p.id, delta)}
+            onReinitialiserAchats={() => onReinitialiserAchats(p.id)}
           />
         ))}
       </div>

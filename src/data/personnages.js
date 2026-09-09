@@ -5,10 +5,20 @@
 // ⚠️ COMMENT MODIFIER UNE STATISTIQUE :
 // Chaque personnage est un bloc ci-dessous. Pour corriger un
 // chiffre, il suffit de changer la valeur après les deux-points.
-// Exemple : pour passer l'Agilité d'Oskara à 3, remplacez
-//   agilite: 4,   par   agilite: 3,
 // Les compétences utilisent les identifiants du fichier
 // competences.js (colonne "id"). Un rang absent = rang 0.
+//
+// ✅ VÉRIFIÉ AVEC LA FICHE PDF : Lowhhrick
+// ⏳ EN ATTENTE DE VÉRIFICATION : Oskara, Pash, 41-VEX,
+//    Mathus, Sasha — leurs valeurs sont provisoires et leur
+//    menu d'améliorations est encore vide.
+//
+// Le bloc `ameliorations` liste ce que le joueur peut acheter
+// avec ses points d'expérience :
+//   type 'competence' → +1 rang dans la compétence `cible`
+//   type 'talent'     → nouveau talent, avec un effet chiffré
+//                       optionnel (seuilBlessures, seuilStress,
+//                       encaissement)
 // ============================================================
 
 export const PERSONNAGES = [
@@ -21,11 +31,11 @@ export const PERSONNAGES = [
     emoji: '🎯',
     avatar: 'avatars/oskara.png',
     couleur: '#2e8b57',
+    verifie: false,
     accroche: 'Tireuse d’élite mortelle et méthodique',
     motivation:
       'Protéger son peuple : elle craint que les machinations de Teemo le Hutt ne finissent par menacer les Twi’leks de Ryloth.',
-    obligation:
-      'Dette familiale — elle doit réunir de quoi racheter la liberté de sa sœur.',
+    obligation: 'Dette familiale — elle doit réunir de quoi racheter la liberté de sa sœur.',
     caracteristiques: {
       vigueur: 2,
       agilite: 4,
@@ -37,12 +47,13 @@ export const PERSONNAGES = [
     seuilBlessures: 12,
     seuilStress: 12,
     encaissement: 4,
+    credits: 500,
     defense: { melee: 0, distance: 0 },
     competences: {
       athletisme: 1,
-      'sang-froid': 1,
+      calme: 1,
       perception: 1,
-      'pilotage-spatial': 1,
+      pilotage: 1,
       'distance-lourdes': 2,
       discretion: 1,
       vigilance: 1,
@@ -56,10 +67,6 @@ export const PERSONNAGES = [
       {
         nom: 'Traqueur',
         description: 'Ajoute un dé de Fortune (bleu) aux tests de Discrétion et de Coordination.',
-      },
-      {
-        nom: 'Cran',
-        description: 'Augmente le seuil de stress de 1 (déjà compté).',
       },
     ],
     armes: [
@@ -76,17 +83,18 @@ export const PERSONNAGES = [
         competence: 'corps-a-corps',
         degats: 3,
         critique: 2,
-        portee: 'Engagé',
-        special: 'Perforante 2',
+        portee: 'Contact',
+        special: 'Perforant 2',
       },
     ],
     equipement: [
-      'Armure rembourrée (+2 encaissement, déjà compté)',
-      'Jumelles électroniques',
-      'Menottes',
-      'Comlink',
-      '2 stimpacks',
+      { nom: 'Armure rembourrée', detail: '+2 encaissement (déjà compté)' },
+      { nom: 'Jumelles électroniques' },
+      { nom: 'Menottes' },
+      { nom: 'Comlink', detail: 'Permet de communiquer à distance.' },
+      { nom: '2 stimpacks', detail: 'Manœuvre : soigne des blessures. Usage unique.' },
     ],
+    ameliorations: [],
   },
 
   {
@@ -98,6 +106,7 @@ export const PERSONNAGES = [
     emoji: '🚀',
     avatar: 'avatars/pash.png',
     couleur: '#c0392b',
+    verifie: false,
     accroche: 'Pilote au charme facile et à la gâchette rapide',
     motivation:
       'Liberté : ballotté toute sa vie par les événements, il est bien décidé à reprendre le contrôle de son destin.',
@@ -113,16 +122,17 @@ export const PERSONNAGES = [
     seuilBlessures: 12,
     seuilStress: 11,
     encaissement: 3,
+    credits: 500,
     defense: { melee: 0, distance: 0 },
     competences: {
       astrogation: 1,
       charme: 2,
-      'sang-froid': 1,
+      calme: 1,
       tromperie: 1,
       artillerie: 1,
-      'pilotage-spatial': 2,
+      pilotage: 2,
       'distance-legeres': 2,
-      debrouillardise: 1,
+      'systeme-d': 1,
       vigilance: 1,
     },
     talents: [
@@ -133,10 +143,6 @@ export const PERSONNAGES = [
       {
         nom: 'Plein gaz',
         description: 'Peut augmenter temporairement la vitesse maximale de son vaisseau de 1.',
-      },
-      {
-        nom: 'Cran',
-        description: 'Augmente le seuil de stress de 1 (déjà compté).',
       },
     ],
     armes: [
@@ -150,12 +156,13 @@ export const PERSONNAGES = [
       },
     ],
     equipement: [
-      'Blouson de pilote',
-      'Comlink',
-      'Datapad',
-      'Dés porte-bonheur',
-      '1 stimpack',
+      { nom: 'Blouson de pilote' },
+      { nom: 'Comlink', detail: 'Permet de communiquer à distance.' },
+      { nom: 'Datapad' },
+      { nom: 'Dés porte-bonheur' },
+      { nom: '1 stimpack', detail: 'Manœuvre : soigne des blessures. Usage unique.' },
     ],
+    ameliorations: [],
   },
 
   {
@@ -167,69 +174,112 @@ export const PERSONNAGES = [
     emoji: '🛡️',
     avatar: 'avatars/lowhhrick.png',
     couleur: '#8b5a2b',
+    verifie: true,
     accroche: 'Colosse au grand cœur, ancien gladiateur d’arène',
     motivation:
       'Vengeance et liberté : réduit en esclavage comme gladiateur par Teemo, il veut faire payer le Hutt et libérer les siens.',
     obligation: 'Prime sur sa tête — esclave évadé.',
     caracteristiques: {
       vigueur: 4,
-      agilite: 2,
+      agilite: 3,
       intelligence: 2,
       ruse: 2,
       volonte: 2,
-      presence: 1,
+      presence: 2,
     },
     seuilBlessures: 18,
     seuilStress: 10,
-    encaissement: 6,
+    encaissement: 4,
+    credits: 400,
     defense: { melee: 0, distance: 0 },
     competences: {
       athletisme: 1,
-      coercition: 1,
-      'corps-a-corps': 2,
-      pugilat: 2,
-      resistance: 1,
-      perception: 1,
-      survie: 1,
+      'sang-froid': 1,
       vigilance: 1,
+      artillerie: 1,
+      'corps-a-corps': 1,
+      'distance-legeres': 1,
+      pugilat: 1,
     },
     talents: [
       {
         nom: 'Rage wookiee',
         description:
-          'Une fois blessé, inflige +1 dégât en mêlée ; +2 s’il souffre d’une blessure critique.',
-      },
-      {
-        nom: 'Force sauvage',
-        description: 'Inflige +1 dégât aux attaques de Corps à corps et de Pugilat (déjà compté).',
-      },
-      {
-        nom: 'Robustesse',
-        description: 'Augmente le seuil de blessures de 2 (déjà compté).',
+          'Quand vous êtes blessé, vos attaques de Corps à corps et de Pugilat infligent +1 dégât. Quand vous avez au moins 1 blessure critique, elles infligent +2 dégâts.',
       },
     ],
     armes: [
       {
         nom: 'Vibrohache',
         competence: 'corps-a-corps',
-        degats: 8,
-        critique: 2,
-        portee: 'Engagé',
-        special: 'Perforante 2, Vicieuse 1',
+        degats: 7,
+        formuleDegats: 'Vigueur + 3',
+        critique: 3,
+        portee: 'Contact',
+        special:
+          'Perforant 2 : l’encaissement de la cible est diminué de 2 points contre cette attaque.',
+      },
+      {
+        nom: 'Pistolet blaster',
+        competence: 'distance-legeres',
+        degats: 6,
+        critique: 3,
+        portee: 'Moyenne',
       },
       {
         nom: 'Poings',
         competence: 'pugilat',
-        degats: 5,
+        degats: 4,
         critique: 5,
-        portee: 'Engagé',
-        special: 'Assommante',
+        portee: 'Contact',
       },
     ],
     equipement: [
-      'Armure de gladiateur (+2 encaissement, déjà compté)',
-      'Trophées d’arène',
-      '1 stimpack',
+      {
+        nom: '2 stimpacks',
+        detail: 'Manœuvre : soigne un être vivant de 4 blessures. Usage unique.',
+      },
+      { nom: 'Comlink', detail: 'Permet de communiquer à distance.' },
+    ],
+    ameliorations: [
+      {
+        id: 'coercition',
+        type: 'competence',
+        cible: 'coercition',
+        nom: 'Compétence Coercition',
+        cout: 10,
+        description:
+          'Vous améliorez votre compétence Coercition et gagnez 1 rang. Votre réserve de dés passe de 2 Aptitudes à 1 Maîtrise et 1 Aptitude.',
+      },
+      {
+        id: 'corps-a-corps',
+        type: 'competence',
+        cible: 'corps-a-corps',
+        nom: 'Compétence Corps à corps',
+        cout: 10,
+        description:
+          'Vous améliorez votre compétence Corps à corps et gagnez 1 rang. Votre réserve de dés passe de 1 Maîtrise et 3 Aptitudes à 2 Maîtrises et 2 Aptitudes.',
+      },
+      {
+        id: 'endurci',
+        type: 'talent',
+        nom: 'Endurci',
+        cout: 5,
+        seuilBlessures: 1,
+        description:
+          'Vous gagnez le talent Endurci. Votre seuil de blessures augmente de 1 point, passant de 18 à 19.',
+        effetTexte: 'Augmente le seuil de blessures de 1 (déjà compté).',
+      },
+      {
+        id: 'force-surhumaine',
+        type: 'talent',
+        nom: 'Force surhumaine',
+        cout: 5,
+        description:
+          'Vous gagnez le talent Force surhumaine. Quand vous touchez une cible avec une arme de corps à corps ou de pugilat, vous infligez +1 point de dégâts.',
+        effetTexte:
+          'Quand vous touchez une cible avec une arme de Corps à corps ou de Pugilat, vous infligez +1 point de dégâts.',
+      },
     ],
   },
 
@@ -242,11 +292,11 @@ export const PERSONNAGES = [
     emoji: '⚕️',
     avatar: 'avatars/41-vex.png',
     couleur: '#5dade2',
+    verifie: false,
     accroche: 'Droïde médecin en quête de perfectionnement',
     motivation:
       'Perfectionnement : sa programmation le pousse à acquérir les derniers algorithmes de chirurgie et de médecine.',
-    obligation:
-      'Considéré comme un bien volé depuis qu’il a quitté sa clinique de Mos Eisley.',
+    obligation: 'Considéré comme un bien volé depuis qu’il a quitté sa clinique de Mos Eisley.',
     caracteristiques: {
       vigueur: 2,
       agilite: 2,
@@ -258,14 +308,15 @@ export const PERSONNAGES = [
     seuilBlessures: 12,
     seuilStress: 12,
     encaissement: 4,
+    credits: 500,
     defense: { melee: 0, distance: 0 },
     competences: {
       medecine: 2,
       mecanique: 1,
-      connaissances: 2,
+      connaissance: 2,
       commandement: 1,
       resistance: 1,
-      'sang-froid': 1,
+      calme: 1,
       'distance-legeres': 1,
     },
     talents: [
@@ -277,10 +328,6 @@ export const PERSONNAGES = [
         nom: 'Droïde',
         description:
           'N’a pas besoin de respirer, manger ni boire ; immunisé contre les poisons, toxines et le vide spatial.',
-      },
-      {
-        nom: 'Cran',
-        description: 'Augmente le seuil de stress de 1 (déjà compté).',
       },
     ],
     armes: [
@@ -302,11 +349,12 @@ export const PERSONNAGES = [
       },
     ],
     equipement: [
-      'Blindage renforcé (+2 encaissement, déjà compté)',
-      'Trousse médicale (medpac)',
-      'Scanner médical',
-      '3 stimpacks',
+      { nom: 'Blindage renforcé', detail: '+2 encaissement (déjà compté)' },
+      { nom: 'Trousse médicale (medpac)' },
+      { nom: 'Scanner médical' },
+      { nom: '3 stimpacks', detail: 'Manœuvre : soigne des blessures. Usage unique.' },
     ],
+    ameliorations: [],
   },
 
   {
@@ -318,6 +366,7 @@ export const PERSONNAGES = [
     emoji: '🔧',
     avatar: 'avatars/mathus.png',
     couleur: '#e67e22',
+    verifie: false,
     accroche: 'Génie de la mécanique, jamais loin de sa boîte à outils',
     motivation:
       'Créateur : rien ne le rend plus heureux que réparer, bricoler et améliorer des machines.',
@@ -333,13 +382,14 @@ export const PERSONNAGES = [
     seuilBlessures: 12,
     seuilStress: 12,
     encaissement: 3,
+    credits: 500,
     defense: { melee: 0, distance: 0 },
     competences: {
       informatique: 2,
       mecanique: 2,
       astrogation: 1,
       coordination: 1,
-      escamotage: 1,
+      magouilles: 1,
       perception: 1,
       'distance-legeres': 1,
       vigilance: 1,
@@ -372,17 +422,18 @@ export const PERSONNAGES = [
         competence: 'corps-a-corps',
         degats: 4,
         critique: 5,
-        portee: 'Engagé',
+        portee: 'Contact',
         special: 'Déséquilibrante',
       },
     ],
     equipement: [
-      'Boîte à outils',
-      'Datapad',
-      'Pièces détachées',
-      'Lunettes de soudure',
-      '1 stimpack',
+      { nom: 'Boîte à outils' },
+      { nom: 'Datapad' },
+      { nom: 'Pièces détachées' },
+      { nom: 'Lunettes de soudure' },
+      { nom: '1 stimpack', detail: 'Manœuvre : soigne des blessures. Usage unique.' },
     ],
+    ameliorations: [],
   },
 
   {
@@ -394,11 +445,11 @@ export const PERSONNAGES = [
     emoji: '🧭',
     avatar: 'avatars/sasha.png',
     couleur: '#9b59b6',
+    verifie: false,
     accroche: 'Aventurière curieuse, à l’aise partout dans la galaxie',
     motivation:
       'Découverte : cartographier les mondes inexplorés de la Bordure Extérieure et voir ce que personne n’a jamais vu.',
-    obligation:
-      'Contrat : la dette de son vaisseau a été rachetée par Teemo le Hutt.',
+    obligation: 'Contrat : la dette de son vaisseau a été rachetée par Teemo le Hutt.',
     caracteristiques: {
       vigueur: 2,
       agilite: 3,
@@ -410,17 +461,18 @@ export const PERSONNAGES = [
     seuilBlessures: 12,
     seuilStress: 12,
     encaissement: 3,
+    credits: 500,
     defense: { melee: 0, distance: 0 },
     competences: {
       astrogation: 1,
-      'sang-froid': 1,
+      calme: 1,
       coordination: 1,
       perception: 2,
-      'pilotage-spatial': 1,
+      pilotage: 1,
       survie: 2,
-      debrouillardise: 1,
+      'systeme-d': 1,
       'distance-legeres': 1,
-      connaissances: 1,
+      connaissance: 1,
     },
     talents: [
       {
@@ -430,11 +482,7 @@ export const PERSONNAGES = [
       {
         nom: 'Système D',
         description:
-          'Retire un dé d’Infortune (noir) des tests de Débrouillardise et de Connaissances (bas-fonds).',
-      },
-      {
-        nom: 'Robustesse',
-        description: 'Augmente le seuil de blessures de 2 (déjà compté).',
+          'Retire un dé d’Infortune (noir) des tests de Système D et de Connaissance (bas-fonds).',
       },
     ],
     armes: [
@@ -451,18 +499,19 @@ export const PERSONNAGES = [
         competence: 'corps-a-corps',
         degats: 3,
         critique: 2,
-        portee: 'Engagé',
-        special: 'Perforante 2',
+        portee: 'Contact',
+        special: 'Perforant 2',
       },
     ],
     equipement: [
-      'Kit de survie',
-      'Jumelles',
-      'Corde synthétique (20 m)',
-      'Rations de voyage',
-      'Comlink',
-      '1 stimpack',
+      { nom: 'Kit de survie' },
+      { nom: 'Jumelles' },
+      { nom: 'Corde synthétique (20 m)' },
+      { nom: 'Rations de voyage' },
+      { nom: 'Comlink', detail: 'Permet de communiquer à distance.' },
+      { nom: '1 stimpack', detail: 'Manœuvre : soigne des blessures. Usage unique.' },
     ],
+    ameliorations: [],
   },
 ]
 

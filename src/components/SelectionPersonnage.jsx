@@ -1,10 +1,9 @@
-import { PERSONNAGES } from '../data/personnages.js'
 import { CARACTERISTIQUES } from '../data/competences.js'
 import Avatar from './Avatar.jsx'
 
 // Écran d'accueil : grandes cartes "poster" des 6 personnages,
 // avec leurs statistiques clés visibles d'un coup d'œil.
-export default function SelectionPersonnage({ onChoisir, onVueMJ }) {
+export default function SelectionPersonnage({ personnages, onChoisir, onVueMJ }) {
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
       <div className="flex items-start justify-between gap-4 flex-wrap mb-8">
@@ -24,7 +23,7 @@ export default function SelectionPersonnage({ onChoisir, onVueMJ }) {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {PERSONNAGES.map((p) => (
+        {personnages.map((p) => (
           <button
             key={p.id}
             onClick={() => onChoisir(p.id)}

@@ -1,6 +1,5 @@
 import { useState } from 'react'
-import { PERSONNAGES, getPersonnage } from '../data/personnages.js'
-import { reserveDeDes } from '../data/competences.js'
+import { reservePersonnage } from '../data/competences.js'
 import { RESERVE_VIDE, lancerReserve } from '../logique/des.js'
 import IconeSymbole from './IconeSymbole.jsx'
 
@@ -48,15 +47,17 @@ function LigneParticipant({ participant, index, actif, onRetirer }) {
   )
 }
 
-export default function SuiviCombat({ combat, majCombat, ajouterHistorique }) {
-  const [pjChoisi, setPjChoisi] = useState(PERSONNAGES[0].id)
-  const [competenceInit, setCompetenceInit] = useState('sang-froid')
+export default function SuiviCombat({ combat, majCombat, ajouterHistorique, personnages }) {
+  const [pjChoisi, setPjChoisi] = useState(personnages[0].id)
+  // « Calme » (Présence) si le personnage est préparé,
+  // « Vigilance » (Volonté) s'il est surpris.
+  const [competenceInit, setCompetenceInit] = useState('calme')
   const [nomPnj, setNomPnj] = useState('')
   const [vertsPnj, setVertsPnj] = useState(2)
   const [jaunesPnj, setJaunesPnj] = useState(0)
 
   const participants = combat?.participants ?? []
-  const pjsDisponibles = PERSONNAGES.filter(
+  const pjsDisponibles = personnages.filter(
     (p) => !participants.some((x) => x.persoId === p.id),
   )
 
@@ -85,14 +86,10 @@ export default function SuiviCombat({ combat, majCombat, ajouterHistorique }) {
   }
 
   const lancerInitiativePj = () => {
-    const perso = getPersonnage(pjChoisi)
+    const perso = personnages.find((p) => p.id === pjChoisi)
     if (!perso) return
-    const nomCompetence = competenceInit === 'sang-froid' ? 'Sang-froid' : 'Vigilance'
-    const carac = competenceInit === 'sang-froid' ? 'presence' : 'volonte'
-    const base = reserveDeDes(
-      perso.caracteristiques[carac],
-      perso.competences[competenceInit] ?? 0,
-    )
+    const nomCompetence = competenceInit === 'calme' ? 'Calme' : 'Vigilance'
+    const base = reservePersonnage(perso, competenceInit)
     const reserve = { ...RESERVE_VIDE, maitrise: base.maitrise, aptitude: base.aptitude }
     const resultat = lancerReserve(reserve)
     enregistrerJet(
@@ -211,7 +208,7 @@ export default function SuiviCombat({ combat, majCombat, ajouterHistorique }) {
               onChange={(e) => setCompetenceInit(e.target.value)}
               className="rounded-lg bg-space-700 border border-space-600 px-2 py-1.5 text-sm"
             >
-              <option value="sang-froid">Sang-froid (préparé)</option>
+              <option value="calme">Calme (préparé)</option>
               <option value="vigilance">Vigilance (surpris)</option>
             </select>
             <button

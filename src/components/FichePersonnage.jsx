@@ -1,9 +1,16 @@
 import { useState } from 'react'
-import { CARACTERISTIQUES, COMPETENCES, reserveDeDes } from '../data/competences.js'
+import {
+  CARACTERISTIQUES,
+  COMPETENCES,
+  reserveDeDes,
+  reservePersonnage,
+} from '../data/competences.js'
 import { RESERVE_VIDE } from '../logique/des.js'
 import Compteur from './Compteur.jsx'
 import ConstructeurReserve from './ConstructeurReserve.jsx'
 import Avatar from './Avatar.jsx'
+import MiniReserve from './MiniReserve.jsx'
+import SectionProgression from './SectionProgression.jsx'
 
 // Pastilles de rang (●●○○○) affichées à côté de chaque compétence.
 function Rangs({ rang }) {
@@ -39,6 +46,8 @@ export default function FichePersonnage({
   onLancer,
   reservePartagee,
   onReserve,
+  progression,
+  onAcheter,
 }) {
   const [compSelectionnee, setCompSelectionnee] = useState(null)
 
@@ -209,7 +218,7 @@ export default function FichePersonnage({
 
         {/* ——— Colonne droite : armes, talents, équipement, histoire ——— */}
         <div className="flex flex-col gap-4">
-          <Section titre="Armes">
+          <Section titre="Armes — cliquez pour préparer l’attaque">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
@@ -217,24 +226,56 @@ export default function FichePersonnage({
                     <th className="pb-1 pr-2">Arme</th>
                     <th className="pb-1 pr-2">Dég.</th>
                     <th className="pb-1 pr-2">Crit.</th>
-                    <th className="pb-1">Portée</th>
+                    <th className="pb-1 pr-2">Portée</th>
+                    <th className="pb-1">Réserve</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-space-700">
-                  {perso.armes.map((a) => (
-                    <tr key={a.nom}>
-                      <td className="py-1.5 pr-2">
-                        <div className="font-semibold">{a.nom}</div>
-                        <div className="text-xs text-space-400">{a.special}</div>
-                      </td>
-                      <td className="py-1.5 pr-2 font-bold text-sw-red">{a.degats}</td>
-                      <td className="py-1.5 pr-2">{a.critique}</td>
-                      <td className="py-1.5">{a.portee}</td>
-                    </tr>
-                  ))}
+                  {perso.armes.map((a) => {
+                    const competenceArme = COMPETENCES.find((c) => c.id === a.competence)
+                    return (
+                      <tr
+                        key={a.nom}
+                        onClick={() =>
+                          competenceArme && selectionner(competenceArme, compSelectionnee === a.competence)
+                        }
+                        className="cursor-pointer hover:bg-space-700/60 transition"
+                        title={
+                          competenceArme
+                            ? `Préparer un jet de ${competenceArme.nom}`
+                            : undefined
+                        }
+                      >
+                        <td className="py-1.5 pr-2">
+                          <div className="font-semibold">{a.nom}</div>
+                          <div className="text-xs text-space-400">
+                            {competenceArme?.nom}
+                            {a.special ? ` · ${a.special}` : ''}
+                          </div>
+                        </td>
+                        <td className="py-1.5 pr-2 font-bold text-sw-red whitespace-nowrap">
+                          {a.degats}
+                          {a.formuleDegats && (
+                            <span className="block text-[10px] font-normal text-space-400">
+                              {a.formuleDegats}
+                            </span>
+                          )}
+                        </td>
+                        <td className="py-1.5 pr-2">{a.critique}</td>
+                        <td className="py-1.5 pr-2">{a.portee}</td>
+                        <td className="py-1.5">
+                          <MiniReserve reserve={reservePersonnage(perso, a.competence)} />
+                        </td>
+                      </tr>
+                    )
+                  })}
                 </tbody>
               </table>
             </div>
+            <p className="text-xs text-space-400 mt-2">
+              En cas de réussite : les dégâts indiqués +1 par Succès net. Le chiffre « Crit. » est
+              le nombre d’Avantages à dépenser pour infliger 1 blessure critique.
+            </p>
           </Section>
 
           <Section titre="Talents">
@@ -243,22 +284,39 @@ export default function FichePersonnage({
                 <li key={t.nom} className="text-sm">
                   <span className="font-semibold text-space-200">{t.nom}.</span>{' '}
                   <span className="text-space-300">{t.description}</span>
+                  {t.acquis && (
+                    <span className="ml-1 text-[10px] uppercase tracking-wide font-bold text-sw-green">
+                      acquis par XP
+                    </span>
+                  )}
                 </li>
               ))}
             </ul>
           </Section>
 
+          <Section titre="Progression — expérience">
+            <SectionProgression
+              perso={perso}
+              progression={progression}
+              onAcheter={onAcheter}
+            />
+          </Section>
+
           <Section titre="Équipement">
-            <ul className="flex flex-wrap gap-2">
+            <ul className="flex flex-col gap-1.5">
               {perso.equipement.map((e) => (
-                <li
-                  key={e}
-                  className="rounded-full border border-space-600 bg-space-700 px-3 py-1 text-xs"
-                >
-                  {e}
+                <li key={e.nom} className="text-sm">
+                  <span className="font-semibold text-space-200">{e.nom}</span>
+                  {e.detail && <span className="text-space-300"> — {e.detail}</span>}
                 </li>
               ))}
             </ul>
+            {perso.credits != null && (
+              <p className="mt-3 pt-2 border-t border-space-700 text-sm">
+                <span className="font-semibold text-space-200">Crédits :</span>{' '}
+                <span className="text-sw-or font-bold">{perso.credits}</span>
+              </p>
+            )}
           </Section>
 
           <Section titre="Motivation & Obligation">

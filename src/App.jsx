@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { getPersonnage } from './data/personnages.js'
+import { PERSONNAGES, getPersonnage } from './data/personnages.js'
+import { personnageEffectif, progressionDe } from './logique/progression.js'
 import { estConfigure } from './firebase.js'
 import {
   useEtatsPartages,
@@ -8,6 +9,7 @@ import {
   useReservesPartagees,
   useCombatPartage,
   useAdversairesPartages,
+  useProgressionPartagee,
 } from './hooks/useSynchronisation.js'
 import SelectionPersonnage from './components/SelectionPersonnage.jsx'
 import FichePersonnage from './components/FichePersonnage.jsx'
@@ -28,6 +30,7 @@ export default function App() {
   const [reserves, majReserve] = useReservesPartagees()
   const [combat, majCombat] = useCombatPartage()
   const [adversaires, majAdversaire] = useAdversairesPartages()
+  const [progressions, majProgression] = useProgressionPartagee()
   const [historiqueOuvert, setHistoriqueOuvert] = useState(false)
   const [aideOuverte, setAideOuverte] = useState(false)
   const [lanceurOuvert, setLanceurOuvert] = useState(false)
@@ -45,7 +48,37 @@ export default function App() {
     setVue('accueil')
   }
 
-  const persoActif = vue !== 'accueil' && vue !== 'mj' ? getPersonnage(vue) : null
+  // Fiches « effectives » : les statistiques de base auxquelles
+  // on applique les améliorations achetées avec l'expérience.
+  const persosEffectifs = PERSONNAGES.map((p) =>
+    personnageEffectif(p, progressionDe(progressions, p.id)),
+  )
+
+  const persoActif =
+    vue !== 'accueil' && vue !== 'mj' ? persosEffectifs.find((p) => p.id === vue) : null
+
+  // Le MJ accorde de l'expérience ; le joueur l'utilise pour
+  // acheter une amélioration de sa fiche.
+  const donnerXp = (persoId, delta) => {
+    const progression = progressionDe(progressions, persoId)
+    majProgression(persoId, {
+      ...progression,
+      xpTotal: Math.max(0, progression.xpTotal + delta),
+    })
+  }
+
+  const acheterAmelioration = (persoId, ameliorationId) => {
+    const progression = progressionDe(progressions, persoId)
+    if (progression.ameliorations.includes(ameliorationId)) return
+    majProgression(persoId, {
+      ...progression,
+      ameliorations: [...progression.ameliorations, ameliorationId],
+    })
+  }
+
+  const reinitialiserAchats = (persoId) => {
+    majProgression(persoId, { ...progressionDe(progressions, persoId), ameliorations: [] })
+  }
 
   const nouvelleEntree = (identite, competence, reserve, resultat) => ({
     ts: Date.now(),
@@ -137,6 +170,8 @@ export default function App() {
             onLancer={ajouterLancer}
             reservePartagee={reserves[persoActif.id]}
             onReserve={(reserve) => majReserve(persoActif.id, reserve)}
+            progression={progressionDe(progressions, persoActif.id)}
+            onAcheter={(ameliorationId) => acheterAmelioration(persoActif.id, ameliorationId)}
           />
         ) : vue === 'mj' ? (
           <VueMJ
@@ -151,11 +186,19 @@ export default function App() {
             adversaires={adversaires}
             majAdversaire={majAdversaire}
             ajouterHistorique={ajouterEntree}
+            personnages={persosEffectifs}
+            progressions={progressions}
+            onDonnerXp={donnerXp}
+            onReinitialiserAchats={reinitialiserAchats}
             onRetour={() => setVue('accueil')}
             onVerrouiller={verrouillerVueMJ}
           />
         ) : (
-          <SelectionPersonnage onChoisir={setVue} onVueMJ={ouvrirVueMJ} />
+          <SelectionPersonnage
+            personnages={persosEffectifs}
+            onChoisir={setVue}
+            onVueMJ={ouvrirVueMJ}
+          />
         )}
       </main>
 

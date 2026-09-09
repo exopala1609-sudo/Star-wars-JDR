@@ -326,7 +326,7 @@ export const PERSONNAGES = [
     emoji: '⚕️',
     avatar: 'avatars/41-vex.png',
     couleur: '#5dade2',
-    verifie: false,
+    verifie: true,
     accroche: 'Droïde médecin en quête de perfectionnement',
     motivation:
       'Perfectionnement : sa programmation le pousse à acquérir les derniers algorithmes de chirurgie et de médecine.',
@@ -335,60 +335,111 @@ export const PERSONNAGES = [
       vigueur: 2,
       agilite: 2,
       intelligence: 4,
-      ruse: 2,
-      volonte: 2,
-      presence: 1,
+      ruse: 1,
+      volonte: 1,
+      presence: 2,
     },
     seuilBlessures: 12,
-    seuilStress: 12,
-    encaissement: 4,
-    credits: 500,
+    seuilStress: 11,
+    encaissement: 2,
+    credits: 400,
     defense: { melee: 0, distance: 0 },
     competences: {
-      medecine: 2,
-      mecanique: 1,
-      connaissance: 2,
-      commandement: 1,
-      resistance: 1,
       calme: 1,
-      'distance-legeres': 1,
+      charme: 1,
+      connaissance: 1,
+      mecanique: 1,
+      medecine: 2,
+      negociation: 1,
+      resistance: 1,
     },
     talents: [
       {
-        nom: 'Chirurgien',
-        description: 'Soigne 1 blessure supplémentaire par test de Médecine réussi.',
-      },
-      {
-        nom: 'Droïde',
+        nom: 'Médipack',
         description:
-          'N’a pas besoin de respirer, manger ni boire ; immunisé contre les poisons, toxines et le vide spatial.',
+          'Une fois par rencontre, il vous permet d’utiliser votre compétence Médecine pour soigner un allié sans malus. Le test est Facile (1 dé de Difficulté) si les blessures du patient sont inférieures ou égales à la moitié de son seuil, Moyen (2 dés) si elles sont supérieures à cette moitié, et Difficile (3 dés) si elles dépassent le seuil. Vous soignez 1 blessure par Succès et 1 point de stress par Avantage. Une fois durant l’aventure, vous pouvez soigner 1 blessure critique ; la difficulté dépend de la blessure en question.',
       },
     ],
     armes: [
       {
-        nom: 'Pistolet blaster léger',
+        nom: 'Blaster léger',
         competence: 'distance-legeres',
         degats: 5,
         critique: 4,
         portee: 'Moyenne',
-        special: 'Paralysante (réglage étourdissant)',
       },
       {
-        nom: 'Grenade paralysante',
+        nom: 'Grenade étourdissante (×3)',
         competence: 'distance-legeres',
         degats: 8,
         critique: '—',
         portee: 'Courte',
-        special: 'Étourdissement, Explosion 3',
+        special:
+          'Dégâts étourdissants, convertis en points de stress. 2 Avantages pour Souffle 8 : tous les personnages au contact de la cible subissent 8 dégâts étourdissants. Usage unique.',
+      },
+      {
+        nom: 'Poings',
+        competence: 'pugilat',
+        degats: 2,
+        critique: 5,
+        portee: 'Contact',
       },
     ],
     equipement: [
-      { nom: 'Blindage renforcé', detail: '+2 encaissement (déjà compté)' },
-      { nom: 'Trousse médicale (medpac)' },
-      { nom: 'Scanner médical' },
-      { nom: '3 stimpacks', detail: 'Manœuvre : soigne des blessures. Usage unique.' },
+      {
+        nom: '2 trousses de réparation d’urgence',
+        detail: 'Manœuvre : soigne un droïde de 4 blessures. Usage unique.',
+      },
+      {
+        nom: 'Médipack',
+        detail: 'Permet de soigner les êtres organiques avec la compétence Médecine.',
+      },
+      { nom: 'Comlink', detail: 'Permet de communiquer à distance.' },
+      {
+        nom: 'Châssis de droïde',
+        detail: 'Plaques blindées : 1 point d’encaissement (déjà inclus)',
+      },
     ],
-    ameliorations: [],
+    ameliorations: [
+      {
+        id: 'negociation',
+        type: 'competence',
+        cible: 'negociation',
+        nom: 'Compétence Négociation',
+        cout: 10,
+        description:
+          'Vous améliorez votre compétence Négociation et gagnez 1 rang. Votre réserve de dés passe de 1 Maîtrise et 1 Aptitude à 2 Maîtrises.',
+      },
+      {
+        id: 'distance-legeres',
+        type: 'competence',
+        cible: 'distance-legeres',
+        nom: 'Compétence Distance (armes légères)',
+        cout: 10,
+        description:
+          'Vous améliorez votre compétence Distance (armes légères) et gagnez 1 rang. Votre réserve de dés passe de 2 Aptitudes à 1 Maîtrise et 1 Aptitude.',
+      },
+      {
+        id: 'robustesse',
+        type: 'talent',
+        nom: 'Robustesse',
+        cout: 5,
+        seuilStress: 1,
+        description:
+          'Vous gagnez le talent Robustesse. Votre seuil de stress augmente de 1 point, passant de 11 à 12.',
+        effetTexte: 'Augmente le seuil de stress de 1 (déjà compté).',
+      },
+      {
+        id: 'chirurgien',
+        type: 'talent',
+        nom: 'Chirurgien',
+        cout: 5,
+        description:
+          'Vous gagnez le talent Chirurgien. Quand vous effectuez un test de Médecine pour aider un personnage à soigner des blessures, celui-ci récupère 1 blessure de plus.',
+        effetTexte:
+          'Un test de Médecine réussi pour soigner un personnage lui fait récupérer 1 blessure de plus.',
+      },
+    ],
   },
 
   {

@@ -31,7 +31,7 @@ export const PERSONNAGES = [
     emoji: '🎯',
     avatar: 'avatars/oskara.png',
     couleur: '#2e8b57',
-    verifie: false,
+    verifie: true,
     accroche: 'Tireuse d’élite mortelle et méthodique',
     motivation:
       'Protéger son peuple : elle craint que les machinations de Teemo le Hutt ne finissent par menacer les Twi’leks de Ryloth.',
@@ -40,35 +40,25 @@ export const PERSONNAGES = [
       vigueur: 2,
       agilite: 4,
       intelligence: 2,
-      ruse: 3,
-      volonte: 1,
-      presence: 2,
+      ruse: 2,
+      volonte: 2,
+      presence: 3,
     },
     seuilBlessures: 12,
-    seuilStress: 12,
+    seuilStress: 13,
     encaissement: 4,
-    credits: 500,
+    credits: 400,
     defense: { melee: 0, distance: 0 },
     competences: {
       athletisme: 1,
-      calme: 1,
+      informatique: 1,
       perception: 1,
       pilotage: 1,
-      'distance-lourdes': 2,
-      discretion: 1,
+      tromperie: 1,
       vigilance: 1,
-      pugilat: 1,
+      'distance-lourdes': 2,
     },
-    talents: [
-      {
-        nom: 'Précision mortelle',
-        description: 'Ajoute +10 aux jets de blessures critiques infligées.',
-      },
-      {
-        nom: 'Traqueur',
-        description: 'Ajoute un dé de Fortune (bleu) aux tests de Discrétion et de Coordination.',
-      },
-    ],
+    talents: [],
     armes: [
       {
         nom: 'Carabine blaster',
@@ -76,25 +66,68 @@ export const PERSONNAGES = [
         degats: 9,
         critique: 3,
         portee: 'Moyenne',
-        special: 'Paralysante (réglage étourdissant)',
       },
       {
-        nom: 'Vibrocouteau',
-        competence: 'corps-a-corps',
-        degats: 3,
-        critique: 2,
+        nom: 'Poings',
+        competence: 'pugilat',
+        degats: 2,
+        critique: 5,
         portee: 'Contact',
-        special: 'Perforant 2',
       },
     ],
     equipement: [
-      { nom: 'Armure rembourrée', detail: '+2 encaissement (déjà compté)' },
-      { nom: 'Jumelles électroniques' },
-      { nom: 'Menottes' },
+      {
+        nom: '2 stimpacks',
+        detail: 'Manœuvre : soigne un être vivant de 4 blessures. Usage unique.',
+      },
       { nom: 'Comlink', detail: 'Permet de communiquer à distance.' },
-      { nom: '2 stimpacks', detail: 'Manœuvre : soigne des blessures. Usage unique.' },
+      { nom: '2 paires de menottes', detail: 'Permettent d’entraver les mains d’un individu.' },
+      {
+        nom: 'Datapad',
+        detail: 'Ordinateur de poche, permet d’accéder aux systèmes informatiques.',
+      },
+      { nom: 'Armure matelassée', detail: 'Encaissement 2 (déjà inclus)' },
     ],
-    ameliorations: [],
+    ameliorations: [
+      {
+        id: 'mecanique',
+        type: 'competence',
+        cible: 'mecanique',
+        nom: 'Compétence Mécanique',
+        cout: 5,
+        description:
+          'Vous améliorez votre compétence Mécanique et gagnez 1 rang. Votre réserve de dés passe de 2 Aptitudes à 1 Maîtrise et 1 Aptitude.',
+      },
+      {
+        id: 'artillerie',
+        type: 'competence',
+        cible: 'artillerie',
+        nom: 'Compétence Artillerie',
+        cout: 10,
+        description:
+          'Vous améliorez votre compétence Artillerie et gagnez 1 rang. Votre réserve de dés passe de 4 Aptitudes à 1 Maîtrise et 3 Aptitudes.',
+      },
+      {
+        id: 'armes-en-main',
+        type: 'talent',
+        nom: 'Armes en main',
+        cout: 5,
+        description:
+          'Vous gagnez le talent Armes en main. Une fois par round, vous pouvez dégainer ou rengainer une arme, ou sortir ou ranger un objet accessible, au prix d’une broutille (sans exécuter de manœuvre).',
+        effetTexte:
+          'Une fois par round, dégainer/rengainer une arme ou sortir/ranger un objet accessible ne coûte qu’une broutille.',
+      },
+      {
+        id: 'bout-portant',
+        type: 'talent',
+        nom: 'Bout portant',
+        cout: 5,
+        description:
+          'Vous gagnez le talent Bout portant. Quand vous touchez une cible au contact ou à portée courte avec votre carabine blaster, un pistolet ou fusil blaster, ou une grenade, vous infligez +1 point de dégâts.',
+        effetTexte:
+          'Au contact ou à portée courte, vos tirs de carabine, pistolet, fusil blaster ou grenade infligent +1 point de dégâts.',
+      },
+    ],
   },
 
   {
@@ -341,7 +374,7 @@ export const PERSONNAGES = [
     },
     seuilBlessures: 12,
     seuilStress: 11,
-    encaissement: 2,
+    encaissement: 3,
     credits: 400,
     defense: { melee: 0, distance: 0 },
     competences: {

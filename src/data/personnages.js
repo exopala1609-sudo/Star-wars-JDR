@@ -8,10 +8,9 @@
 // Les compétences utilisent les identifiants du fichier
 // competences.js (colonne "id"). Un rang absent = rang 0.
 //
-// ✅ VÉRIFIÉ AVEC LA FICHE PDF : Lowhhrick
-// ⏳ EN ATTENTE DE VÉRIFICATION : Oskara, Pash, 41-VEX,
-//    Mathus, Sasha — leurs valeurs sont provisoires et leur
-//    menu d'améliorations est encore vide.
+// ✅ LES 6 FICHES ONT ÉTÉ VÉRIFIÉES AVEC LES PDF DES JOUEURS.
+// Chaque réserve de dés a été recalculée et comparée aux
+// valeurs imprimées sur les fiches.
 //
 // Le bloc `ameliorations` liste ce que le joueur peut acheter
 // avec ses points d'expérience :
@@ -604,7 +603,7 @@ export const PERSONNAGES = [
     emoji: '🧭',
     avatar: 'avatars/sasha.png',
     couleur: '#9b59b6',
-    verifie: false,
+    verifie: true,
     accroche: 'Aventurière curieuse, à l’aise partout dans la galaxie',
     motivation:
       'Découverte : cartographier les mondes inexplorés de la Bordure Extérieure et voir ce que personne n’a jamais vu.',
@@ -612,65 +611,90 @@ export const PERSONNAGES = [
     caracteristiques: {
       vigueur: 2,
       agilite: 3,
-      intelligence: 2,
+      intelligence: 3,
       ruse: 3,
-      volonte: 2,
+      volonte: 3,
       presence: 2,
     },
     seuilBlessures: 12,
-    seuilStress: 12,
+    seuilStress: 13,
     encaissement: 3,
-    credits: 500,
+    credits: 400,
     defense: { melee: 0, distance: 0 },
     competences: {
-      astrogation: 1,
+      athletisme: 1,
       calme: 1,
-      coordination: 1,
-      perception: 2,
+      discretion: 1,
+      perception: 1,
       pilotage: 1,
-      survie: 2,
-      'systeme-d': 1,
-      'distance-legeres': 1,
-      connaissance: 1,
+      survie: 1,
+      'distance-lourdes': 1,
     },
-    talents: [
-      {
-        nom: 'Cartographe galactique',
-        description: 'Retire un dé d’Infortune (noir) des tests d’Astrogation.',
-      },
-      {
-        nom: 'Système D',
-        description:
-          'Retire un dé d’Infortune (noir) des tests de Système D et de Connaissance (bas-fonds).',
-      },
-    ],
+    talents: [],
     armes: [
       {
-        nom: 'Pistolet blaster léger',
-        competence: 'distance-legeres',
-        degats: 5,
-        critique: 4,
+        nom: 'Fusil à percussion',
+        competence: 'distance-lourdes',
+        degats: 7,
+        critique: 5,
         portee: 'Moyenne',
-        special: 'Paralysante (réglage étourdissant)',
       },
       {
-        nom: 'Vibrocouteau',
-        competence: 'corps-a-corps',
-        degats: 3,
-        critique: 2,
+        nom: 'Poings',
+        competence: 'pugilat',
+        degats: 2,
+        critique: 4,
         portee: 'Contact',
-        special: 'Perforant 2',
       },
     ],
     equipement: [
-      { nom: 'Kit de survie' },
-      { nom: 'Jumelles' },
-      { nom: 'Corde synthétique (20 m)' },
-      { nom: 'Rations de voyage' },
+      {
+        nom: '2 stimpacks',
+        detail: 'Manœuvre : soigne un être vivant de 4 blessures. Usage unique.',
+      },
       { nom: 'Comlink', detail: 'Permet de communiquer à distance.' },
-      { nom: '1 stimpack', detail: 'Manœuvre : soigne des blessures. Usage unique.' },
+      { nom: 'Vêtements épais', detail: 'Encaissement 1 (déjà inclus)' },
+      { nom: 'Macrojumelles', detail: 'Agrandit les objets lointains.' },
     ],
-    ameliorations: [],
+    ameliorations: [
+      {
+        id: 'medecine',
+        type: 'competence',
+        cible: 'medecine',
+        nom: 'Compétence Médecine',
+        cout: 5,
+        description:
+          'Vous améliorez votre compétence Médecine et gagnez 1 rang. Votre réserve de dés passe de 3 Aptitudes à 1 Maîtrise et 2 Aptitudes.',
+      },
+      {
+        id: 'vigilance',
+        type: 'competence',
+        cible: 'vigilance',
+        nom: 'Compétence Vigilance',
+        cout: 10,
+        description:
+          'Vous améliorez votre compétence Vigilance et gagnez 1 rang. Votre réserve de dés passe de 3 Aptitudes à 1 Maîtrise et 2 Aptitudes.',
+      },
+      {
+        id: 'robustesse',
+        type: 'talent',
+        nom: 'Robustesse',
+        cout: 5,
+        seuilStress: 1,
+        description:
+          'Vous gagnez le talent Robustesse. Votre seuil de stress augmente de 1 point, passant de 13 à 14.',
+        effetTexte: 'Augmente le seuil de stress de 1 (déjà compté).',
+      },
+      {
+        id: 'recuperation-rapide',
+        type: 'talent',
+        nom: 'Récupération rapide',
+        cout: 5,
+        description:
+          'Vous gagnez le talent Récupération rapide. Récupérez 1 point de stress de plus à la fin d’une rencontre.',
+        effetTexte: 'Récupère 1 point de stress de plus à la fin d’une rencontre.',
+      },
+    ],
   },
 ]
 

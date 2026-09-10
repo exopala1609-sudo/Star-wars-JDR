@@ -12,6 +12,7 @@ import { useEffect, useState } from 'react'
 import { ref, onValue, set, push, query, limitToLast } from 'firebase/database'
 import { db, estConfigure } from '../firebase.js'
 import { PERSONNAGES } from '../data/personnages.js'
+import { APPAREIL_ID } from '../logique/identite.js'
 
 const etatInitial = () =>
   Object.fromEntries(
@@ -115,6 +116,114 @@ export function useReservesPartagees() {
   }
 
   return [reserves, majReserve]
+}
+
+// ——— Réclamation des personnages : quel appareil occupe quelle
+// fiche. Un personnage réclamé devient inaccessible aux autres
+// joueurs (le MJ, lui, garde toujours accès à tout).
+export function useOccupantsPartages() {
+  const [occupants, setOccupants] = useState({})
+
+  useEffect(() => {
+    if (!db) return
+    return onValue(ref(db, 'salle/occupants'), (instantane) => {
+      setOccupants(instantane.val() ?? {})
+    })
+  }, [])
+
+  const majOccupant = (persoId, occupant) => {
+    setOccupants((precedent) => {
+      const nouveaux = { ...precedent }
+      if (occupant === null) delete nouveaux[persoId]
+      else nouveaux[persoId] = occupant
+      return nouveaux
+    })
+    if (db) set(ref(db, `salle/occupants/${persoId}`), occupant)
+  }
+
+  const reclamer = (persoId) =>
+    majOccupant(persoId, { appareil: APPAREIL_ID, ts: Date.now() })
+  const liberer = (persoId) => majOccupant(persoId, null)
+
+  return { occupants, reclamer, liberer }
+}
+
+// ——— Blocs-notes : une entrée par personnage, plus la clé
+// « mj » pour le bloc-notes du Maître de Jeu.
+const CLE_NOTES = 'swjdr-notes'
+
+export function useNotesPartagees() {
+  const [notes, setNotes] = useState(() => {
+    if (estConfigure) return {}
+    try {
+      return JSON.parse(localStorage.getItem(CLE_NOTES)) ?? {}
+    } catch {
+      return {}
+    }
+  })
+
+  useEffect(() => {
+    if (!db) return
+    return onValue(ref(db, 'salle/notes'), (instantane) => {
+      setNotes(instantane.val() ?? {})
+    })
+  }, [])
+
+  const majNote = (cle, texte) => {
+    setNotes((precedent) => {
+      const nouvelles = { ...precedent, [cle]: texte }
+      if (!db) {
+        try {
+          localStorage.setItem(CLE_NOTES, JSON.stringify(nouvelles))
+        } catch {
+          // stockage local indisponible : les notes restent en mémoire
+        }
+      }
+      return nouvelles
+    })
+    if (db) set(ref(db, `salle/notes/${cle}`), texte)
+  }
+
+  return [notes, majNote]
+}
+
+// ——— Diffusion des lancers : chaque jet est publié une fois et
+// tous les autres écrans en reçoivent une notification.
+// ⚠️ Les jets secrets du MJ ne transportent JAMAIS de dés ni de
+// résultat : la base est ouverte, donc tout ce qui y est écrit
+// est techniquement lisible.
+export function useDiffusionLancers() {
+  const [notifications, setNotifications] = useState([])
+
+  useEffect(() => {
+    if (!db) return
+    // Le premier appel renvoie l'état déjà présent dans la base :
+    // on l'ignore pour ne pas afficher un jet périmé à l'arrivée.
+    let premierAppel = true
+    return onValue(ref(db, 'salle/dernierLancer'), (instantane) => {
+      const lancer = instantane.val()
+      if (premierAppel) {
+        premierAppel = false
+        return
+      }
+      if (!lancer || lancer.origine === APPAREIL_ID) return
+      setNotifications((precedent) => [...precedent, lancer].slice(-3))
+    })
+  }, [])
+
+  const diffuser = (lancer) => {
+    if (!db) return
+    set(ref(db, 'salle/dernierLancer'), {
+      ...lancer,
+      origine: APPAREIL_ID,
+      ts: Date.now(),
+    })
+  }
+
+  const retirerNotification = (id) =>
+    setNotifications((precedent) => precedent.filter((n) => n.id !== id))
+
+  return { notifications, diffuser, retirerNotification }
 }
 
 // ——— Progression : expérience accordée par le MJ et

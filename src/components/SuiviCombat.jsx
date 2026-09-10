@@ -47,7 +47,41 @@ function LigneParticipant({ participant, index, actif, onRetirer }) {
   )
 }
 
-export default function SuiviCombat({ combat, majCombat, ajouterHistorique, personnages }) {
+// Interrupteur « jet secret » réutilisé partout où le MJ lance
+// pour un PNJ (initiative manuelle et initiative d'un adversaire).
+export function BasculeSecret({ actif, onChange, libelle }) {
+  return (
+    <label className="flex items-center gap-2 text-xs cursor-pointer">
+      <input
+        type="checkbox"
+        checked={actif}
+        onChange={(e) => onChange(e.target.checked)}
+        className="sr-only"
+      />
+      <span
+        className={`relative h-4 w-7 rounded-full transition shrink-0 ${
+          actif ? 'bg-sw-or' : 'bg-space-600'
+        }`}
+      >
+        <span
+          className={`absolute top-0.5 h-3 w-3 rounded-full bg-white transition-all ${
+            actif ? 'left-3.5' : 'left-0.5'
+          }`}
+        />
+      </span>
+      <span className={actif ? 'text-sw-or font-semibold' : 'text-space-400'}>{libelle}</span>
+    </label>
+  )
+}
+
+export default function SuiviCombat({
+  combat,
+  majCombat,
+  enregistrerLancer,
+  personnages,
+  secretPnj,
+  onSecretPnj,
+}) {
   const [pjChoisi, setPjChoisi] = useState(personnages[0].id)
   // « Calme » (Présence) si le personnage est préparé,
   // « Vigilance » (Volonté) s'il est surpris.
@@ -61,16 +95,8 @@ export default function SuiviCombat({ combat, majCombat, ajouterHistorique, pers
     (p) => !participants.some((x) => x.persoId === p.id),
   )
 
-  const enregistrerJet = (identite, competence, reserve, resultat) => {
-    ajouterHistorique({
-      ts: Date.now(),
-      heure: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
-      perso: identite,
-      competence,
-      reserve,
-      resultat,
-    })
-  }
+  const enregistrerJet = (identite, competence, reserve, resultat, secret = false) =>
+    enregistrerLancer({ identite, competence, reserve, resultat, secret })
 
   const ajouterParticipant = (participant) => {
     const nouveaux = trierParticipants([...participants, participant])
@@ -120,6 +146,7 @@ export default function SuiviCombat({ combat, majCombat, ajouterHistorique, pers
       'Initiative',
       reserve,
       resultat,
+      secretPnj,
     )
     ajouterParticipant({
       cle: crypto.randomUUID(),
@@ -267,6 +294,11 @@ export default function SuiviCombat({ combat, majCombat, ajouterHistorique, pers
               🎲 Lancer
             </button>
           </div>
+          <BasculeSecret
+            actif={secretPnj}
+            onChange={onSecretPnj}
+            libelle="🤫 Initiative secrète — les joueurs ne verront pas le résultat"
+          />
         </div>
       </div>
 

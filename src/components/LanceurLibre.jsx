@@ -8,10 +8,11 @@ import AnimationLancer from './AnimationLancer.jsx'
 // sans passer par une fiche. Utile au MJ (PNJ, tests cachés)
 // comme aux joueurs (jets improvisés). Le jet part dans
 // l'historique partagé de la table.
-export default function LanceurLibre({ ouvert, onFermer, onLancer }) {
+export default function LanceurLibre({ ouvert, onFermer, onLancer, secretDisponible }) {
   const [des, setDes] = useState({ ...RESERVE_VIDE })
   const [resultat, setResultat] = useState(null)
   const [animation, setAnimation] = useState(null)
+  const [secret, setSecret] = useState(false)
 
   if (!ouvert) return null
 
@@ -22,7 +23,7 @@ export default function LanceurLibre({ ouvert, onFermer, onLancer }) {
   const terminerAnimation = () => {
     if (!animation) return
     setResultat(animation)
-    onLancer(des, animation)
+    onLancer(des, animation, secret)
     setAnimation(null)
   }
 
@@ -64,6 +65,44 @@ export default function LanceurLibre({ ouvert, onFermer, onLancer }) {
               />
             ))}
           </div>
+
+          {secretDisponible && (
+            <label
+              className={`flex items-center gap-3 rounded-xl border px-3 py-2 cursor-pointer transition ${
+                secret
+                  ? 'border-sw-or/70 bg-sw-or/10'
+                  : 'border-space-600 bg-space-800/70 hover:border-space-500'
+              }`}
+            >
+              <input
+                type="checkbox"
+                checked={secret}
+                onChange={(e) => setSecret(e.target.checked)}
+                className="sr-only"
+              />
+              <span
+                className={`relative h-5 w-9 rounded-full transition shrink-0 ${
+                  secret ? 'bg-sw-or' : 'bg-space-600'
+                }`}
+              >
+                <span
+                  className={`absolute top-0.5 h-4 w-4 rounded-full bg-white transition-all ${
+                    secret ? 'left-4.5' : 'left-0.5'
+                  }`}
+                />
+              </span>
+              <span className="flex-1 min-w-0">
+                <span className={`text-sm font-semibold ${secret ? 'text-sw-or' : ''}`}>
+                  🤫 Jet secret
+                </span>
+                <span className="block text-xs text-space-400">
+                  {secret
+                    ? 'Les joueurs verront « Le MJ a effectué un jet secret… », sans le résultat.'
+                    : 'Le résultat sera visible de toute la table.'}
+                </span>
+              </span>
+            </label>
+          )}
 
           <div className="flex gap-2">
             <button

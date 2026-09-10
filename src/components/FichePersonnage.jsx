@@ -11,6 +11,7 @@ import ConstructeurReserve from './ConstructeurReserve.jsx'
 import Avatar from './Avatar.jsx'
 import MiniReserve from './MiniReserve.jsx'
 import SectionProgression from './SectionProgression.jsx'
+import BlocNotes from './BlocNotes.jsx'
 
 // Pastilles de rang (●●○○○) affichées à côté de chaque compétence.
 function Rangs({ rang }) {
@@ -48,6 +49,9 @@ export default function FichePersonnage({
   onReserve,
   progression,
   onAcheter,
+  notes,
+  onNotes,
+  onLiberer,
 }) {
   const [compSelectionnee, setCompSelectionnee] = useState(null)
 
@@ -106,6 +110,15 @@ export default function FichePersonnage({
           >
             ← Personnages
           </button>
+          {onLiberer && (
+            <button
+              onClick={onLiberer}
+              title="Rendre ce personnage disponible pour un autre joueur"
+              className="rounded-lg border border-space-600 bg-space-800 px-3 py-2 text-sm text-space-300 hover:border-sw-or hover:text-sw-or transition order-last sm:order-none"
+            >
+              🔓 Libérer
+            </button>
+          )}
           <div className="flex items-center gap-4 flex-1 min-w-60">
             <Avatar perso={perso} tailleClasse="h-16 w-16" tailleEmoji="text-3xl" />
             <div>
@@ -323,6 +336,15 @@ export default function FichePersonnage({
                 <span className="text-sw-or font-bold">{perso.credits}</span>
               </p>
             )}
+          </Section>
+
+          <Section titre="Mes notes">
+            <BlocNotes
+              valeur={notes}
+              onChange={onNotes}
+              lignes={7}
+              placeholder="Indices, noms de PNJ, plan d’action, butin à partager… Vos notes sont sauvegardées automatiquement et vous suivent d’une séance à l’autre."
+            />
           </Section>
 
           <Section titre="Motivation & Obligation">

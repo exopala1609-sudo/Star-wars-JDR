@@ -10,7 +10,11 @@ import {
   useCombatPartage,
   useAdversairesPartages,
   useProgressionPartagee,
+  useOccupantsPartages,
+  useNotesPartagees,
+  useDiffusionLancers,
 } from './hooks/useSynchronisation.js'
+import { APPAREIL_ID } from './logique/identite.js'
 import SelectionPersonnage from './components/SelectionPersonnage.jsx'
 import FichePersonnage from './components/FichePersonnage.jsx'
 import HistoriqueLancers from './components/HistoriqueLancers.jsx'
@@ -20,6 +24,7 @@ import LanceurLibre from './components/LanceurLibre.jsx'
 import BandeauCombat from './components/BandeauCombat.jsx'
 import BandeauAdversaires from './components/BandeauAdversaires.jsx'
 import AccesMJ, { accesMemorise, oublierAcces } from './components/AccesMJ.jsx'
+import NotificationsLancers from './components/NotificationsLancers.jsx'
 
 export default function App() {
   // vue = 'accueil' | 'mj' | identifiant d'un personnage
@@ -31,10 +36,14 @@ export default function App() {
   const [combat, majCombat] = useCombatPartage()
   const [adversaires, majAdversaire] = useAdversairesPartages()
   const [progressions, majProgression] = useProgressionPartagee()
+  const { occupants, reclamer, liberer } = useOccupantsPartages()
+  const [notes, majNote] = useNotesPartagees()
+  const { notifications, diffuser, retirerNotification } = useDiffusionLancers()
   const [historiqueOuvert, setHistoriqueOuvert] = useState(false)
   const [aideOuverte, setAideOuverte] = useState(false)
   const [lanceurOuvert, setLanceurOuvert] = useState(false)
   const [demandeCodeMJ, setDemandeCodeMJ] = useState(false)
+  const [secretPnj, setSecretPnj] = useState(false)
 
   // La Vue MJ n'est accessible qu'après saisie du code ; une fois
   // validé, il reste mémorisé sur l'appareil du MJ.
@@ -80,25 +89,47 @@ export default function App() {
     majProgression(persoId, { ...progressionDe(progressions, persoId), ameliorations: [] })
   }
 
-  const nouvelleEntree = (identite, competence, reserve, resultat) => ({
-    ts: Date.now(),
-    heure: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
-    perso: identite,
-    competence,
-    reserve,
-    resultat,
-  })
+  // Point de passage unique de TOUS les lancers : l'historique
+  // partagé et la diffusion aux autres écrans.
+  //
+  // ⚠️ Un jet secret n'écrit ni dés ni résultat dans la base :
+  // celle-ci est ouverte, donc tout ce qu'on y met est lisible.
+  // Le résultat reste sur l'écran du MJ, dans son lanceur.
+  const enregistrerLancer = ({ identite, competence, reserve, resultat, secret }) => {
+    const heure = new Date().toLocaleTimeString('fr-FR', {
+      hour: '2-digit',
+      minute: '2-digit',
+    })
 
-  const ajouterLancer = ({ competence, reserve, resultat }) => {
-    ajouterEntree(
-      nouvelleEntree(
-        { nom: persoActif.nom, emoji: persoActif.emoji, couleur: persoActif.couleur },
-        competence,
-        reserve,
-        resultat,
-      ),
-    )
+    if (secret) {
+      ajouterEntree({
+        ts: Date.now(),
+        heure,
+        perso: { nom: 'Maître de Jeu', emoji: '🤫', couleur: '#e8a33d' },
+        competence: 'Jet secret',
+        secret: true,
+      })
+      diffuser({ id: crypto.randomUUID(), secret: true })
+      return
+    }
+
+    ajouterEntree({ ts: Date.now(), heure, perso: identite, competence, reserve, resultat })
+    diffuser({
+      id: crypto.randomUUID(),
+      secret: false,
+      perso: identite,
+      competence,
+      nets: resultat.nets,
+    })
   }
+
+  const ajouterLancer = ({ competence, reserve, resultat }) =>
+    enregistrerLancer({
+      identite: { nom: persoActif.nom, emoji: persoActif.emoji, couleur: persoActif.couleur },
+      competence,
+      reserve,
+      resultat,
+    })
 
   // Identité affichée dans l'historique pour un lancer libre :
   // le personnage ouvert, sinon le MJ, sinon « La table »
@@ -108,8 +139,27 @@ export default function App() {
       ? { nom: 'MJ', emoji: '🎛', couleur: '#e8a33d' }
       : { nom: 'La table', emoji: '🎲', couleur: '#5c6b8f' }
 
-  const ajouterLancerLibre = (reserve, resultat) => {
-    ajouterEntree(nouvelleEntree(identiteLibre, 'Lancer libre', reserve, resultat))
+  const ajouterLancerLibre = (reserve, resultat, secret) =>
+    enregistrerLancer({
+      identite: identiteLibre,
+      competence: 'Lancer libre',
+      reserve,
+      resultat,
+      secret,
+    })
+
+  // Réclamation d'un personnage : un écran ne peut ouvrir que
+  // les fiches libres ou celles qu'il occupe déjà.
+  const choisirPersonnage = (persoId) => {
+    const occupant = occupants[persoId]
+    if (occupant && occupant.appareil !== APPAREIL_ID) return
+    if (!occupant) reclamer(persoId)
+    setVue(persoId)
+  }
+
+  const libererEtRevenir = (persoId) => {
+    liberer(persoId)
+    setVue('accueil')
   }
 
   return (
@@ -172,6 +222,13 @@ export default function App() {
             onReserve={(reserve) => majReserve(persoActif.id, reserve)}
             progression={progressionDe(progressions, persoActif.id)}
             onAcheter={(ameliorationId) => acheterAmelioration(persoActif.id, ameliorationId)}
+            notes={notes[persoActif.id] ?? ''}
+            onNotes={(texte) => majNote(persoActif.id, texte)}
+            onLiberer={
+              occupants[persoActif.id]?.appareil === APPAREIL_ID
+                ? () => libererEtRevenir(persoActif.id)
+                : null
+            }
           />
         ) : vue === 'mj' ? (
           <VueMJ
@@ -185,18 +242,26 @@ export default function App() {
             majCombat={majCombat}
             adversaires={adversaires}
             majAdversaire={majAdversaire}
-            ajouterHistorique={ajouterEntree}
+            enregistrerLancer={enregistrerLancer}
             personnages={persosEffectifs}
             progressions={progressions}
             onDonnerXp={donnerXp}
             onReinitialiserAchats={reinitialiserAchats}
+            occupants={occupants}
+            onLiberer={liberer}
+            notesMJ={notes.mj ?? ''}
+            onNotesMJ={(texte) => majNote('mj', texte)}
+            secretPnj={secretPnj}
+            onSecretPnj={setSecretPnj}
             onRetour={() => setVue('accueil')}
             onVerrouiller={verrouillerVueMJ}
           />
         ) : (
           <SelectionPersonnage
             personnages={persosEffectifs}
-            onChoisir={setVue}
+            occupants={occupants}
+            monAppareil={APPAREIL_ID}
+            onChoisir={choisirPersonnage}
             onVueMJ={ouvrirVueMJ}
           />
         )}
@@ -214,6 +279,13 @@ export default function App() {
         ouvert={lanceurOuvert}
         onFermer={() => setLanceurOuvert(false)}
         onLancer={ajouterLancerLibre}
+        secretDisponible={vue === 'mj'}
+      />
+
+      <NotificationsLancers
+        notifications={notifications}
+        onRetirer={retirerNotification}
+        onOuvrirHistorique={() => setHistoriqueOuvert(true)}
       />
 
       <AccesMJ

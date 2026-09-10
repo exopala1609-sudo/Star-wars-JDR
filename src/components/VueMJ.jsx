@@ -5,6 +5,7 @@ import IconeSymbole from './IconeSymbole.jsx'
 import MiniReserve from './MiniReserve.jsx'
 import SuiviCombat from './SuiviCombat.jsx'
 import SectionAdversaires from './SectionAdversaires.jsx'
+import BlocNotes from './BlocNotes.jsx'
 import { estConfigure } from '../firebase.js'
 
 // Vue du Maître de Jeu : tableau de bord des 6 personnages
@@ -88,6 +89,8 @@ function CartePersonnageMJ({
   progression,
   onDonnerXp,
   onReinitialiserAchats,
+  occupe,
+  onLiberer,
 }) {
   const maj = (champ, v) => onEtat({ ...etat, [champ]: v })
   const horsCombat = etat.blessures >= perso.seuilBlessures
@@ -108,6 +111,16 @@ function CartePersonnageMJ({
           <span className="rounded-full bg-sw-red/20 border border-sw-red/50 text-sw-red text-xs font-bold px-2 py-0.5">
             K.O.
           </span>
+        )}
+        {occupe && (
+          <button
+            onClick={onLiberer}
+            title="Libérer ce personnage : il redeviendra disponible pour tous les joueurs"
+            className="shrink-0 rounded-full border border-sw-green/50 bg-sw-green/10 text-sw-green
+                       text-xs font-bold px-2 py-0.5 hover:bg-sw-red/20 hover:border-sw-red/50 hover:text-sw-red transition"
+          >
+            🔒 Pris · libérer
+          </button>
         )}
       </div>
       <LigneJauge
@@ -214,11 +227,17 @@ export default function VueMJ({
   majCombat,
   adversaires,
   majAdversaire,
-  ajouterHistorique,
+  enregistrerLancer,
   personnages,
   progressions,
   onDonnerXp,
   onReinitialiserAchats,
+  occupants,
+  onLiberer,
+  notesMJ,
+  onNotesMJ,
+  secretPnj,
+  onSecretPnj,
   onRetour,
   onVerrouiller,
 }) {
@@ -251,12 +270,28 @@ export default function VueMJ({
         </button>
       </div>
 
+      {/* ——— Bloc-notes du MJ ——— */}
+      <div className="datapad p-4 flex flex-col gap-3">
+        <h3 className="titre-sw text-sm text-sw-or flex items-center gap-2 border-b border-sw-or/25 pb-2">
+          <span className="inline-block h-3.5 w-1.5 bg-sw-or -skew-x-12 shrink-0" />
+          Bloc-notes du Maître de Jeu
+        </h3>
+        <BlocNotes
+          valeur={notesMJ}
+          onChange={onNotesMJ}
+          lignes={8}
+          placeholder="Intrigues en cours, PNJ rencontrés, indices à distiller, rappels de règles… Sauvegarde automatique."
+        />
+      </div>
+
       {/* ——— Suivi de combat ——— */}
       <SuiviCombat
         combat={combat}
         majCombat={majCombat}
-        ajouterHistorique={ajouterHistorique}
+        enregistrerLancer={enregistrerLancer}
         personnages={personnages}
+        secretPnj={secretPnj}
+        onSecretPnj={onSecretPnj}
       />
 
       {/* ——— Adversaires ——— */}
@@ -265,7 +300,9 @@ export default function VueMJ({
         majAdversaire={majAdversaire}
         combat={combat}
         majCombat={majCombat}
-        ajouterHistorique={ajouterHistorique}
+        enregistrerLancer={enregistrerLancer}
+        secretPnj={secretPnj}
+        onSecretPnj={onSecretPnj}
       />
 
       {/* ——— Réserve de Force du groupe ——— */}
@@ -319,6 +356,8 @@ export default function VueMJ({
             progression={progressionDe(progressions, p.id)}
             onDonnerXp={(delta) => onDonnerXp(p.id, delta)}
             onReinitialiserAchats={() => onReinitialiserAchats(p.id)}
+            occupe={Boolean(occupants[p.id])}
+            onLiberer={() => onLiberer(p.id)}
           />
         ))}
       </div>

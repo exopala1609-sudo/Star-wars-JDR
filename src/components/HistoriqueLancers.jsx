@@ -34,7 +34,11 @@ export default function HistoriqueLancers({ entrees, ouvert, onFermer }) {
           {entrees.map((entree) => (
             <div
               key={entree.id}
-              className="rounded-xl border border-space-600 bg-space-800/80 p-3 flex flex-col gap-2"
+              className={`rounded-xl border p-3 flex flex-col gap-2 ${
+                entree.secret
+                  ? 'border-sw-or/40 bg-space-800/50'
+                  : 'border-space-600 bg-space-800/80'
+              }`}
             >
               <div className="flex items-center gap-2 text-sm">
                 <span
@@ -47,8 +51,16 @@ export default function HistoriqueLancers({ entrees, ouvert, onFermer }) {
                 <span className="text-space-400">· {entree.competence}</span>
                 <span className="ml-auto text-xs text-space-400">{entree.heure}</span>
               </div>
-              <MiniReserve reserve={entree.reserve} />
-              <ResultatLancer resultat={entree.resultat} compact />
+              {entree.secret ? (
+                <p className="text-xs text-space-400 italic">
+                  Résultat connu du seul Maître de Jeu.
+                </p>
+              ) : (
+                <>
+                  <MiniReserve reserve={entree.reserve} />
+                  <ResultatLancer resultat={entree.resultat} compact />
+                </>
+              )}
             </div>
           ))}
         </div>

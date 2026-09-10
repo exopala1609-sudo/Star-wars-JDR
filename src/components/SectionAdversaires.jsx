@@ -1,5 +1,6 @@
 import { GABARITS_ADVERSAIRES, GABARIT_VIERGE, LIBELLES_RANG } from '../data/adversaires.js'
 import { RESERVE_VIDE, lancerReserve } from '../logique/des.js'
+import { BasculeSecret } from './SuiviCombat.jsx'
 
 // Section « Adversaires » de la Vue MJ : poser des ennemis sur
 // la table depuis des gabarits prêts, suivre leurs blessures,
@@ -152,7 +153,9 @@ export default function SectionAdversaires({
   majAdversaire,
   combat,
   majCombat,
-  ajouterHistorique,
+  enregistrerLancer,
+  secretPnj,
+  onSecretPnj,
 }) {
   const liste = Object.entries(adversaires).map(([cle, valeur]) => ({ ...valeur, cle }))
 
@@ -170,13 +173,12 @@ export default function SectionAdversaires({
       maitrise: adversaire.maitrise,
     }
     const resultat = lancerReserve(reserve)
-    ajouterHistorique({
-      ts: Date.now(),
-      heure: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
-      perso: { nom: adversaire.nom, emoji: adversaire.emoji, couleur: '#7f1d1d' },
+    enregistrerLancer({
+      identite: { nom: adversaire.nom, emoji: adversaire.emoji, couleur: '#7f1d1d' },
       competence: 'Initiative',
       reserve,
       resultat,
+      secret: secretPnj,
     })
     const participants = [
       ...(combat.participants ?? []),
@@ -238,6 +240,14 @@ export default function SectionAdversaires({
           + Personnalisé
         </button>
       </div>
+
+      {combat && liste.length > 0 && (
+        <BasculeSecret
+          actif={secretPnj}
+          onChange={onSecretPnj}
+          libelle="🤫 Initiatives secrètes — les joueurs ne verront pas les résultats"
+        />
+      )}
 
       {liste.length === 0 ? (
         <p className="text-sm text-space-400 italic">

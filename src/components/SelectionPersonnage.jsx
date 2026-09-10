@@ -3,7 +3,13 @@ import Avatar from './Avatar.jsx'
 
 // Écran d'accueil : grandes cartes "poster" des 6 personnages,
 // avec leurs statistiques clés visibles d'un coup d'œil.
-export default function SelectionPersonnage({ personnages, onChoisir, onVueMJ }) {
+export default function SelectionPersonnage({
+  personnages,
+  occupants,
+  monAppareil,
+  onChoisir,
+  onVueMJ,
+}) {
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
       <div className="flex items-start justify-between gap-4 flex-wrap mb-8">
@@ -23,14 +29,39 @@ export default function SelectionPersonnage({ personnages, onChoisir, onVueMJ })
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {personnages.map((p) => (
+        {personnages.map((p) => {
+          const occupant = occupants[p.id]
+          const aMoi = occupant?.appareil === monAppareil
+          const prisAilleurs = Boolean(occupant) && !aMoi
+          return (
           <button
             key={p.id}
-            onClick={() => onChoisir(p.id)}
-            className="group text-left datapad datapad-hover transition hover:-translate-y-1"
+            onClick={() => !prisAilleurs && onChoisir(p.id)}
+            disabled={prisAilleurs}
+            title={
+              prisAilleurs
+                ? 'Ce personnage est déjà utilisé par un autre joueur'
+                : undefined
+            }
+            className={`group text-left datapad transition ${
+              prisAilleurs
+                ? 'opacity-40 grayscale cursor-not-allowed'
+                : 'datapad-hover hover:-translate-y-1'
+            }`}
           >
             <div className="p-6 flex flex-col items-center gap-4">
               <Avatar perso={p} tailleClasse="h-28 w-28" tailleEmoji="text-5xl" />
+
+              {aMoi && (
+                <span className="rounded-full border border-sw-green/50 bg-sw-green/10 text-sw-green px-3 py-0.5 text-xs font-bold">
+                  ✓ Votre personnage
+                </span>
+              )}
+              {prisAilleurs && (
+                <span className="rounded-full border border-space-500 bg-space-700 text-space-300 px-3 py-0.5 text-xs font-bold">
+                  🔒 Pris par un autre joueur
+                </span>
+              )}
 
               <div className="text-center">
                 <div className="titre-sw text-xl text-sw-yellow">{p.nom}</div>
@@ -69,15 +100,26 @@ export default function SelectionPersonnage({ personnages, onChoisir, onVueMJ })
               <p className="text-sm text-space-300 italic text-center min-h-10">{p.accroche}</p>
 
               <span
-                className="w-full text-center rounded-lg bg-sw-yellow text-black font-bold uppercase tracking-wider
-                           py-2.5 text-sm group-hover:brightness-110 transition"
+                className={`w-full text-center rounded-lg font-bold uppercase tracking-wider
+                           py-2.5 text-sm transition ${
+                             prisAilleurs
+                               ? 'bg-space-600 text-space-300'
+                               : 'bg-sw-yellow text-black group-hover:brightness-110'
+                           }`}
               >
-                Ouvrir la fiche
+                {prisAilleurs ? 'Indisponible' : aMoi ? 'Reprendre la fiche' : 'Ouvrir la fiche'}
               </span>
             </div>
           </button>
-        ))}
+          )
+        })}
       </div>
+
+      <p className="text-xs text-space-400 mt-6">
+        Choisir un personnage le réserve pour votre écran : les autres joueurs ne pourront plus
+        l’ouvrir. Le Maître de Jeu garde accès à toutes les fiches et peut libérer un personnage
+        à tout moment.
+      </p>
     </div>
   )
 }

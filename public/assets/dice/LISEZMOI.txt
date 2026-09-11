@@ -1,0 +1,72 @@
+TEXTURES DES DÉS 3D — déposez vos images ici
+===========================================
+
+Ce dossier attend 38 fichiers PNG, un par symbole distinct.
+
+CONSEILS
+  • Format carré, 512 x 512 pixels recommandé.
+  • Le symbole doit tenir dans le cercle central : les coins
+    de l'image débordent de la face et ne seront pas visibles.
+  • Le fond de l'image sert de couleur de face.
+
+UNE FOIS VOS IMAGES DÉPOSÉES
+  Ouvrez src/data/texturesDes.js et passez la ligne
+      export const UTILISER_IMAGES = false
+  à true. Tant qu'elle vaut false, les dés utilisent le
+  dessin automatique, qui fonctionne déjà très bien.
+  Une image manquante retombe sur le dessin automatique :
+  vous pouvez donc les fournir au fur et à mesure.
+
+LISTE DES FICHIERS ATTENDUS
+
+  Dé jaune — Maîtrise (12 faces)
+    jaune_vide.png                face vide
+    jaune_1_succes.png            1 succès
+    jaune_2_succes.png            2 succès
+    jaune_1_avantage.png          1 avantage
+    jaune_succes_avantage.png     1 succès + 1 avantage
+    jaune_2_avantages.png         2 avantages
+    jaune_triomphe.png            1 triomphe
+
+  Dé vert — Aptitude (8 faces)
+    vert_vide.png                 face vide
+    vert_1_succes.png             1 succès
+    vert_2_succes.png             2 succès
+    vert_1_avantage.png           1 avantage
+    vert_succes_avantage.png      1 succès + 1 avantage
+    vert_2_avantages.png          2 avantages
+
+  Dé bleu — Fortune (6 faces)
+    bleu_vide.png                 face vide
+    bleu_1_succes.png             1 succès
+    bleu_succes_avantage.png      1 succès + 1 avantage
+    bleu_2_avantages.png          2 avantages
+    bleu_1_avantage.png           1 avantage
+
+  Dé rouge — Défi (12 faces)
+    rouge_vide.png                face vide
+    rouge_1_echec.png             1 échec
+    rouge_2_echecs.png            2 échecs
+    rouge_1_menace.png            1 menace
+    rouge_echec_menace.png        1 échec + 1 menace
+    rouge_2_menaces.png           2 menaces
+    rouge_desastre.png            1 désastre
+
+  Dé violet — Difficulté (8 faces)
+    violet_vide.png               face vide
+    violet_1_echec.png            1 échec
+    violet_2_echecs.png           2 échecs
+    violet_1_menace.png           1 menace
+    violet_2_menaces.png          2 menaces
+    violet_echec_menace.png       1 échec + 1 menace
+
+  Dé noir — Infortune (6 faces)
+    noir_vide.png                 face vide
+    noir_1_echec.png              1 échec
+    noir_1_menace.png             1 menace
+
+  Dé blanc — Force (12 faces)
+    blanc_1_obscur.png            1 point obscur
+    blanc_2_obscurs.png           2 points obscurs
+    blanc_1_lumineux.png          1 point lumineux
+    blanc_2_lumineux.png          2 points lumineux

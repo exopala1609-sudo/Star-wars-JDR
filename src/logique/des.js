@@ -16,6 +16,7 @@ export const TYPES_DES = {
   aptitude: {
     nom: 'Aptitude',
     couleur: 'var(--color-de-aptitude)',
+    hex: '#41ad49', // doit rester identique à index.css
     texte: '#ffffff',
     facettes: 8,
     faces: [
@@ -32,6 +33,7 @@ export const TYPES_DES = {
   maitrise: {
     nom: 'Maîtrise',
     couleur: 'var(--color-de-maitrise)',
+    hex: '#fff200', // doit rester identique à index.css
     texte: '#1a1a1a',
     facettes: 12,
     faces: [
@@ -52,6 +54,7 @@ export const TYPES_DES = {
   fortune: {
     nom: 'Fortune',
     couleur: 'var(--color-de-fortune)',
+    hex: '#72cddc', // doit rester identique à index.css
     texte: '#1a1a1a',
     facettes: 6,
     faces: [{}, {}, { s: 1 }, { s: 1, a: 1 }, { a: 2 }, { a: 1 }],
@@ -59,6 +62,7 @@ export const TYPES_DES = {
   difficulte: {
     nom: 'Difficulté',
     couleur: 'var(--color-de-difficulte)',
+    hex: '#52287e', // doit rester identique à index.css
     texte: '#ffffff',
     facettes: 8,
     faces: [
@@ -75,6 +79,7 @@ export const TYPES_DES = {
   defi: {
     nom: 'Défi',
     couleur: 'var(--color-de-defi)',
+    hex: '#bc1c2e', // doit rester identique à index.css
     texte: '#ffffff',
     facettes: 12,
     faces: [
@@ -95,6 +100,7 @@ export const TYPES_DES = {
   infortune: {
     nom: 'Infortune',
     couleur: 'var(--color-de-infortune)',
+    hex: '#1a1a1a', // doit rester identique à index.css
     texte: '#ffffff',
     facettes: 6,
     faces: [{}, {}, { e: 1 }, { e: 1 }, { m: 1 }, { m: 1 }],
@@ -102,6 +108,7 @@ export const TYPES_DES = {
   force: {
     nom: 'Force',
     couleur: 'var(--color-de-force)',
+    hex: '#f5f5f5', // doit rester identique à index.css
     texte: '#1a1a1a',
     facettes: 12,
     faces: [

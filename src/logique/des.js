@@ -1,3 +1,5 @@
+import { elementAleatoire } from './aleatoire.js'
+
 // ============================================================
 // MOTEUR DE DÉS NARRATIFS — Star Wars : Aux Confins de l'Empire
 //
@@ -155,8 +157,8 @@ export function lancerReserve(reserve) {
     const nombre = reserve[type] ?? 0
     const def = TYPES_DES[type]
     for (let i = 0; i < nombre; i++) {
-      const face = def.faces[Math.floor(Math.random() * def.faces.length)]
-      des.push({ type, face })
+      // Tirage cryptographique équitable — voir aleatoire.js
+      des.push({ type, face: elementAleatoire(def.faces) })
     }
   }
 

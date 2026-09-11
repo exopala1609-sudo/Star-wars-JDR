@@ -11,6 +11,7 @@ import {
   urlSvgSymbole,
   cheminSymbole,
   symbolesUtilises,
+  NOMS_SYMBOLES,
 } from '../data/texturesDes.js'
 
 // ============================================================
@@ -79,8 +80,14 @@ async function chargerSymbole(symbole) {
     try {
       return await chargerImage(cheminSymbole(symbole))
     } catch {
-      // Image absente ou illisible : on bascule sans bruit sur
-      // le dessin intégré.
+      // Le repli est silencieux à l'écran, mais signalé dans la
+      // console : sans ce message, un simple nom de fichier mal
+      // orthographié passerait totalement inaperçu.
+      console.warn(
+        `[Dés 3D] Image introuvable : ${cheminSymbole(symbole)}\n` +
+          `→ le dessin intégré est utilisé pour « ${NOMS_SYMBOLES[symbole]} ».\n` +
+          `→ vérifiez le nom du fichier : les majuscules et les accents comptent.`,
+      )
     }
   }
   return chargerImage(urlSvgSymbole(symbole))
@@ -98,21 +105,34 @@ export async function preparerSymboles() {
 
 // Pose un symbole sur la face, en le recolorant si besoin pour
 // qu'il contraste avec la couleur du dé.
+//
+// Les proportions de l'image sont conservées : une image plus
+// large que haute reste plus large que haute. Elle est
+// simplement mise à l'échelle pour tenir dans l'emplacement
+// prévu, puis centrée — vos fichiers n'ont donc pas besoin
+// d'être parfaitement carrés.
 function dessinerSymbole(contexte, image, { x, y, taille }, couleur) {
+  const echelle = Math.min(taille / image.width, taille / image.height)
+  const largeur = Math.max(1, Math.round(image.width * echelle))
+  const hauteur = Math.max(1, Math.round(image.height * echelle))
+  const gauche = x - largeur / 2
+  const haut = y - hauteur / 2
+
   if (!RECOLORER_LES_SYMBOLES) {
-    contexte.drawImage(image, x - taille / 2, y - taille / 2, taille, taille)
+    contexte.drawImage(image, gauche, haut, largeur, hauteur)
     return
   }
   // On dessine le symbole à part, puis on remplace ses pixels
   // par la couleur voulue en conservant leur transparence.
   const tampon = document.createElement('canvas')
-  tampon.width = tampon.height = taille
+  tampon.width = largeur
+  tampon.height = hauteur
   const ctx = tampon.getContext('2d')
-  ctx.drawImage(image, 0, 0, taille, taille)
+  ctx.drawImage(image, 0, 0, largeur, hauteur)
   ctx.globalCompositeOperation = 'source-in'
   ctx.fillStyle = couleur
-  ctx.fillRect(0, 0, taille, taille)
-  contexte.drawImage(tampon, x - taille / 2, y - taille / 2)
+  ctx.fillRect(0, 0, largeur, hauteur)
+  contexte.drawImage(tampon, gauche, haut)
 }
 
 const cacheMateriaux = new Map()

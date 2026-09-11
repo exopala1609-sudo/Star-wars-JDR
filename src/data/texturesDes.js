@@ -28,7 +28,7 @@ export const UTILISER_MES_SYMBOLES = true
 //
 // Si vos images sont déjà coloriées et que vous voulez qu'elles
 // soient posées telles quelles, passez ce réglage à false.
-export const RECOLORER_LES_SYMBOLES = false
+export const RECOLORER_LES_SYMBOLES = true
 
 export const DOSSIER_IMAGES = 'assets/dice/'
 
@@ -95,7 +95,8 @@ export const urlSvgSymbole = (symbole) =>
   )
 
 export const cheminSymbole = (symbole) =>
-  `${import.meta.env.BASE_URL}${DOSSIER_IMAGES}${FICHIERS_SYMBOLES[symbole]}`
+  // encodeURI protège les noms contenant des accents ou des espaces
+  encodeURI(`${import.meta.env.BASE_URL}${DOSSIER_IMAGES}${FICHIERS_SYMBOLES[symbole]}`)
 
 // Liste des symboles réellement utilisés par les 7 dés
 export function symbolesUtilises() {

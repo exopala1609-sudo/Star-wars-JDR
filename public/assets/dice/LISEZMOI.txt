@@ -6,6 +6,19 @@ les faces toute seule : elle applique la couleur du dé en
 fond, puis place le ou les symboles à la bonne taille et au
 bon endroit, y compris quand une face en porte deux.
 
+⚠️  LE NOM DES FICHIERS DOIT ÊTRE EXACT
+    Les serveurs web distinguent les majuscules des minuscules.
+    « Avantage.png » et « avantage.png » sont deux fichiers
+    DIFFÉRENTS : le premier ne sera pas trouvé.
+    Évitez aussi les accents : écrivez « succes.png », et non
+    « Succès.png ».
+
+    Si une image n'est pas trouvée, l'application utilise le
+    dessin intégré sans rien casser — mais elle le signale dans
+    la console du navigateur (touche F12, onglet « Console »).
+    C'est le premier endroit à regarder si vos symboles
+    n'apparaissent pas.
+
 FICHIERS ATTENDUS
     succes.png              Succès            dés : Maîtrise, Aptitude, Fortune
     avantage.png            Avantage          dés : Maîtrise, Aptitude, Fortune

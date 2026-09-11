@@ -4,10 +4,13 @@ import { TYPES_DES } from './des.js'
 import { solidePourFaces, faceVersLeHaut, decalageTextures, textureDeLaFace } from './geometrieDes.js'
 import { entierAleatoire } from './aleatoire.js'
 import {
-  UTILISER_IMAGES,
-  TEXTURES_DES,
-  urlSvgDeLaFace,
-  cheminImage,
+  UTILISER_MES_SYMBOLES,
+  RECOLORER_LES_SYMBOLES,
+  COTE_TEXTURE,
+  dispositionDeLaFace,
+  urlSvgSymbole,
+  cheminSymbole,
+  symbolesUtilises,
 } from '../data/texturesDes.js'
 
 // ============================================================
@@ -48,40 +51,68 @@ const IMAGES_REPOS = 18 // images conservées après immobilisation
 const SEUIL_IMMOBILE = 0.2
 const IMAGES_APLAT = 10 // images pour redresser un dé légèrement de travers
 
-// ——— Matériaux et textures ———
+// ============================================================
+// ASSEMBLAGE DES FACES
+//
+// Vous ne fournissez que les symboles ; les faces sont
+// composées ici, une fois pour toutes :
+//   fond à la couleur du dé + symbole(s) dimensionnés et placés.
+//
+// Chaque symbole est chargé une seule fois (votre PNG s'il
+// existe, sinon le dessin intégré de l'application), puis
+// réutilisé sur toutes les faces de tous les dés qui l'emploient.
+// ============================================================
 
-const cacheTextures = new Map()
+function chargerImage(source) {
+  return new Promise((resoudre, rejeter) => {
+    const image = new Image()
+    image.onload = () => resoudre(image)
+    image.onerror = rejeter
+    image.src = source
+  })
+}
 
-function textureDeFace(type, indexFace) {
-  const cle = `${type}-${indexFace}`
-  if (cacheTextures.has(cle)) return cacheTextures.get(cle)
-
-  const chargeur = new THREE.TextureLoader()
-  // Le dessin automatique est prêt immédiatement ; l'image
-  // personnalisée, si elle existe, viendra le remplacer.
-  const texture = chargeur.load(urlSvgDeLaFace(type, indexFace))
-  texture.colorSpace = THREE.SRGBColorSpace
-  texture.anisotropy = 4
-
-  if (UTILISER_IMAGES && TEXTURES_DES[type]?.images?.[indexFace]) {
-    chargeur.load(
-      cheminImage(type, indexFace),
-      (imagePersonnalisee) => {
-        imagePersonnalisee.colorSpace = THREE.SRGBColorSpace
-        imagePersonnalisee.anisotropy = 4
-        texture.image = imagePersonnalisee.image
-        texture.needsUpdate = true
-      },
-      undefined,
-      () => {
-        // Image absente ou illisible : on garde le dessin
-        // automatique, sans rien casser.
-      },
-    )
+// Charge un symbole : votre image si elle est disponible, le
+// dessin intégré sinon. Ne peut pas échouer.
+async function chargerSymbole(symbole) {
+  if (UTILISER_MES_SYMBOLES) {
+    try {
+      return await chargerImage(cheminSymbole(symbole))
+    } catch {
+      // Image absente ou illisible : on bascule sans bruit sur
+      // le dessin intégré.
+    }
   }
+  return chargerImage(urlSvgSymbole(symbole))
+}
 
-  cacheTextures.set(cle, texture)
-  return texture
+let imagesSymboles = null
+
+export async function preparerSymboles() {
+  if (imagesSymboles) return imagesSymboles
+  const symboles = symbolesUtilises()
+  const chargees = await Promise.all(symboles.map(chargerSymbole))
+  imagesSymboles = Object.fromEntries(symboles.map((s, i) => [s, chargees[i]]))
+  return imagesSymboles
+}
+
+// Pose un symbole sur la face, en le recolorant si besoin pour
+// qu'il contraste avec la couleur du dé.
+function dessinerSymbole(contexte, image, { x, y, taille }, couleur) {
+  if (!RECOLORER_LES_SYMBOLES) {
+    contexte.drawImage(image, x - taille / 2, y - taille / 2, taille, taille)
+    return
+  }
+  // On dessine le symbole à part, puis on remplace ses pixels
+  // par la couleur voulue en conservant leur transparence.
+  const tampon = document.createElement('canvas')
+  tampon.width = tampon.height = taille
+  const ctx = tampon.getContext('2d')
+  ctx.drawImage(image, 0, 0, taille, taille)
+  ctx.globalCompositeOperation = 'source-in'
+  ctx.fillStyle = couleur
+  ctx.fillRect(0, 0, taille, taille)
+  contexte.drawImage(tampon, x - taille / 2, y - taille / 2)
 }
 
 const cacheMateriaux = new Map()
@@ -89,14 +120,25 @@ const cacheMateriaux = new Map()
 function materiauxDuDe(type) {
   if (cacheMateriaux.has(type)) return cacheMateriaux.get(type)
   const def = TYPES_DES[type]
-  const materiaux = def.faces.map(
-    (_, i) =>
-      new THREE.MeshStandardMaterial({
-        map: textureDeFace(type, i),
-        roughness: 0.45,
-        metalness: 0.05,
-      }),
-  )
+
+  const materiaux = def.faces.map((face) => {
+    const toile = document.createElement('canvas')
+    toile.width = toile.height = COTE_TEXTURE
+    const contexte = toile.getContext('2d')
+
+    contexte.fillStyle = def.hex
+    contexte.fillRect(0, 0, COTE_TEXTURE, COTE_TEXTURE)
+    for (const emplacement of dispositionDeLaFace(face)) {
+      const image = imagesSymboles?.[emplacement.symbole]
+      if (image) dessinerSymbole(contexte, image, emplacement, def.texte)
+    }
+
+    const texture = new THREE.CanvasTexture(toile)
+    texture.colorSpace = THREE.SRGBColorSpace
+    texture.anisotropy = 4
+    return new THREE.MeshStandardMaterial({ map: texture, roughness: 0.45, metalness: 0.05 })
+  })
+
   cacheMateriaux.set(type, materiaux)
   return materiaux
 }
@@ -329,8 +371,11 @@ export function creerScene(conteneur) {
 
   // Lance les dés et rejoue la trajectoire. Renvoie une promesse
   // résolue quand tous les dés sont immobiles.
-  const lancer = (resultat) =>
-    new Promise((terminer) => {
+  const lancer = async (resultat) => {
+    // Les symboles ne sont chargés qu'une fois, au premier lancer
+    await preparerSymboles()
+
+    return new Promise((terminer) => {
       viderDes()
       const { images, decalages } = simuler(resultat)
 
@@ -380,6 +425,7 @@ export function creerScene(conteneur) {
       }
       animation = requestAnimationFrame(boucle)
     })
+  }
 
   const detruire = () => {
     if (animation) cancelAnimationFrame(animation)

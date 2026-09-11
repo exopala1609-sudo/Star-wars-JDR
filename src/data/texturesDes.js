@@ -18,7 +18,7 @@ import { balisesSymbole } from '../logique/symbolesSvg.js'
 // ou les ajouter au fur et à mesure.
 // ============================================================
 
-export const UTILISER_MES_SYMBOLES = false
+export const UTILISER_MES_SYMBOLES = true
 
 // Vos images sont recolorées automatiquement pour rester
 // lisibles sur chaque dé : un Succès s'affiche en blanc sur le
@@ -28,7 +28,7 @@ export const UTILISER_MES_SYMBOLES = false
 //
 // Si vos images sont déjà coloriées et que vous voulez qu'elles
 // soient posées telles quelles, passez ce réglage à false.
-export const RECOLORER_LES_SYMBOLES = true
+export const RECOLORER_LES_SYMBOLES = false
 
 export const DOSSIER_IMAGES = 'assets/dice/'
 

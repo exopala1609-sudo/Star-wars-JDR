@@ -45,11 +45,18 @@ export default function ResultatLancer({ resultat, compact = false }) {
       />,
     )
   } else {
+    // Un jet sans aucun succès net est un échec, même quand
+    // succès et échecs se sont exactement annulés.
+    const echecs = Math.abs(nets.succes)
     badges.push(
       <Badge
         key="s"
         symbole="e"
-        texte={`${Math.abs(nets.succes)} Échec${Math.abs(nets.succes) > 1 ? 's' : ''} net${Math.abs(nets.succes) > 1 ? 's' : ''} — Échec`}
+        texte={
+          echecs === 0
+            ? 'Aucun succès — Échec'
+            : `${echecs} Échec${echecs > 1 ? 's' : ''} net${echecs > 1 ? 's' : ''} — Échec`
+        }
         fond="bg-red-700/90 text-white"
       />,
     )

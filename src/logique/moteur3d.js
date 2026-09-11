@@ -333,8 +333,6 @@ export function creerScene(conteneur) {
 
   const scene = new THREE.Scene()
   const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100)
-  camera.position.set(0, 10.6, 7.4)
-  camera.lookAt(0, 0, 0)
 
   scene.add(new THREE.AmbientLight(0xffffff, 1.5))
   const lumiere = new THREE.DirectionalLight(0xfff2cc, 2.4)
@@ -368,11 +366,28 @@ export function creerScene(conteneur) {
   liseres.position.y = 0.01
   scene.add(liseres)
 
+  // La caméra recule autant qu'il le faut pour que le tapis
+  // tienne entièrement à l'écran, quelle que soit la forme de la
+  // fenêtre : un écran étroit et haut demande un recul plus
+  // important qu'un écran large.
+  const DIRECTION_CAMERA = new THREE.Vector3(0, 0.82, 0.57).normalize()
+
   const redimensionner = () => {
     const l = conteneur.clientWidth || 1
     const h = conteneur.clientHeight || 1
     rendu.setSize(l, h, false)
     camera.aspect = l / h
+
+    const ouvertureVerticale = THREE.MathUtils.degToRad(camera.fov)
+    const ouvertureHorizontale =
+      2 * Math.atan(Math.tan(ouvertureVerticale / 2) * camera.aspect)
+    // Marge de 15 % pour ne pas coller aux bords
+    const reculProfondeur = (TAPIS_Z * 1.15) / Math.tan(ouvertureVerticale / 2)
+    const reculLargeur = (TAPIS_X * 1.15) / Math.tan(ouvertureHorizontale / 2)
+    const recul = Math.min(Math.max(reculProfondeur, reculLargeur, 9), 24)
+
+    camera.position.copy(DIRECTION_CAMERA).multiplyScalar(recul)
+    camera.lookAt(0, 0, 0)
     camera.updateProjectionMatrix()
   }
   redimensionner()

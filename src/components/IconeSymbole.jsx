@@ -1,15 +1,45 @@
 import { TRACES_SYMBOLES } from '../logique/symbolesSvg.js'
+import { useSymbolesImages } from '../logique/symbolesImages.js'
+import { cheminSymbole } from '../data/texturesDes.js'
 
 // ============================================================
-// ICÔNES SVG DES SYMBOLES NARRATIFS — zéro dépendance externe.
-// Les tracés viennent de logique/symbolesSvg.js, partagés avec
-// les textures des dés 3D : un seul dessin pour les deux usages.
+// ICÔNES DES SYMBOLES NARRATIFS
 //
-// Chaque icône est tracée en `currentColor` et hérite donc
-// automatiquement de la couleur du texte qui l'entoure.
+// Deux sources possibles, dans cet ordre :
+//   1. votre image PNG si vous en avez fourni une pour ce
+//      symbole — la même que sur les dés 3D ;
+//   2. sinon le dessin intégré de l'application.
+//
+// Dans les deux cas l'icône prend la couleur du texte qui
+// l'entoure : votre image est utilisée comme pochoir, remplie
+// avec cette couleur. Elle reste donc lisible aussi bien sur un
+// badge vert que dans le panneau d'aide.
 // ============================================================
 
 export default function IconeSymbole({ symbole, className = 'h-4 w-4' }) {
+  const imagesDisponibles = useSymbolesImages()
+
+  if (imagesDisponibles.has(symbole)) {
+    const pochoir = `url("${cheminSymbole(symbole)}")`
+    return (
+      <span
+        aria-hidden="true"
+        className={`inline-block shrink-0 ${className}`}
+        style={{
+          backgroundColor: 'currentColor',
+          WebkitMaskImage: pochoir,
+          maskImage: pochoir,
+          WebkitMaskRepeat: 'no-repeat',
+          maskRepeat: 'no-repeat',
+          WebkitMaskPosition: 'center',
+          maskPosition: 'center',
+          WebkitMaskSize: 'contain',
+          maskSize: 'contain',
+        }}
+      />
+    )
+  }
+
   const traces = TRACES_SYMBOLES[symbole]
   if (!traces) return null
   const cercles = TRACES_SYMBOLES[`${symbole}Cercles`] ?? []

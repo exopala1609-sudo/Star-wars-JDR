@@ -41,6 +41,19 @@ const GUIDE_DES = [
   },
 ]
 
+// Couleur de chaque symbole, reprise des badges de résultat :
+// l'œil fait ainsi le lien entre l'aide et les jets.
+const COULEURS_SYMBOLES = {
+  s: 'text-green-400',
+  a: 'text-sky-400',
+  t: 'text-sw-yellow',
+  e: 'text-red-400',
+  m: 'text-orange-400',
+  d: 'text-purple-400',
+  l: 'text-white',
+  o: 'text-space-300',
+}
+
 const LEXIQUE = [
   { symbole: 's', nom: 'Succès', effet: 'Fait progresser l’action ; il en faut plus que d’Échecs pour réussir.' },
   { symbole: 'e', nom: 'Échec', effet: 'Annule un Succès ; l’action échoue s’ils dominent.' },
@@ -107,13 +120,19 @@ export default function AideDeJeu({ ouvert, onFermer }) {
           </Section>
 
           <Section titre="Le lexique des symboles">
-            <ul className="flex flex-col gap-2">
+            <p className="text-xs text-space-400 mb-3 -mt-1">
+              Ce sont exactement les symboles que vous verrez sur les faces des dés.
+            </p>
+            <ul className="flex flex-col gap-2.5">
               {LEXIQUE.map(({ symbole, nom, effet }) => (
                 <li key={symbole} className="flex items-start gap-3 text-sm">
-                  <span className="flex h-6 w-6 items-center justify-center rounded-md bg-space-700 border border-space-600 shrink-0 mt-0.5 text-sw-yellow">
-                    <IconeSymbole symbole={symbole} />
+                  <span
+                    className={`flex h-11 w-11 items-center justify-center rounded-lg bg-space-800
+                                border border-space-600 shrink-0 ${COULEURS_SYMBOLES[symbole]}`}
+                  >
+                    <IconeSymbole symbole={symbole} className="h-7 w-7" />
                   </span>
-                  <span>
+                  <span className="pt-0.5">
                     <span className="font-semibold text-space-200">{nom}.</span>{' '}
                     <span className="text-space-300">{effet}</span>
                   </span>
